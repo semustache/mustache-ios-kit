@@ -5,24 +5,47 @@ import PackageDescription
 
 let package = Package(
     name: "MustacheKit",
+    platforms: [.iOS(.v15)],
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "MustacheKit",
-            targets: ["MustacheKit"]),
+            name: "MustacheFoundation",
+            targets: ["MustacheFoundation"]),
+        .library(
+            name: "MustacheServices",
+            targets: ["MustacheServices"]),
+        .library(
+            name: "MustacheUIKit",
+            targets: ["MustacheUIKit"]),
+        .library(
+            name: "MustacheRxSwift",
+            targets: ["MustacheRxSwift"]),
+        .library(
+            name: "MustacheCombine",
+            targets: ["MustacheCombine"]),
     ],
     dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
+        .package(url: "https://github.com/hmlongco/Resolver.git", exact: "1.5.0"),
+        .package(url: "https://github.com/onevcat/Kingfisher.git", exact: "7.7.0"),
+        .package(url: "https://github.com/SnapKit/SnapKit.git", exact: "5.6.0"),
+        .package(url: "https://github.com/ReactiveX/RxSwift.git", exact: "6.6.0"),
+        .package(url: "https://github.com/RxSwiftCommunity/RxSwiftExt.git", exact: "6.1.0"),
+        .package(url: "https://github.com/mustachedk/RxViewController.git", exact: "2.0.1"),
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "MustacheKit",
+            name: "MustacheFoundation",
             dependencies: []),
-        .testTarget(
-            name: "MustacheKitTests",
-            dependencies: ["MustacheKit"]),
+        .target(
+            name: "MustacheServices",
+            dependencies: ["MustacheFoundation", "Resolver"]),
+        .target(
+            name: "MustacheUIKit",
+            dependencies: ["MustacheFoundation", "Kingfisher", "SnapKit"]),
+        .target(
+            name: "MustacheRxSwift",
+            dependencies: ["RxSwift", "RxSwiftExt", "RxViewController", "MustacheServices", "MustacheUIKit"]),
+        .target(
+            name: "MustacheCombine",
+            dependencies: []),
     ]
 )
