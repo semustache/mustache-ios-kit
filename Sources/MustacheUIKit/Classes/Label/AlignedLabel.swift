@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 /// A Label that can be aligned top and bottom
-public class AlignedLabel: Label {
+public class AlignedLabel: UILabel {
 
     /// Vertical alignment of the text
     public var verticalAlignment: VerticalAlignment = .middle {

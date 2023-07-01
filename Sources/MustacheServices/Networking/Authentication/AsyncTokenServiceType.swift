@@ -17,7 +17,7 @@ protocol AsyncTokenServiceType: Actor {
 actor AsyncTokenService: AsyncTokenServiceType {
     
     @Injected
-    var credentialsService: CredentialsServiceType
+    var credentialsService: AsyncCredentialsServiceType
     
     var refreshTask: Task<AuthToken, Error>?
     

@@ -1,6 +1,6 @@
 import UIKit
 
-open class HiddenTextField: TextField {
+open class HiddenTextField: UITextField {
 
     open override var placeholder: String? {
         get { return super.placeholder }

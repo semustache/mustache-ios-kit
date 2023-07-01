@@ -1,125 +1,81 @@
 import Foundation
 import MustacheFoundation
 
-public protocol CredentialsServiceType: AnyActor {
+public protocol CredentialsServiceType: AnyObject {
     
-    static var accessibility: KeychainItemAccessibility { get set }
+    var username: String? { get set }
     
-    func getCredential<T: Credential> (type: CredentialType) async -> T?
+    var password: String? { get set }
     
-    func setCredential(type: CredentialType, value: Credential?) async
+    var bearer: String? { get set }
     
-    func invalidate(type: CredentialType) async
+    var oauthToken: OAuthTokenType? { get set }
     
-    func clearState() async
+    var oauthToken2: OAuthTokenType? { get set }
+    
+    func clearState()
     
 }
 
-public actor CredentialsService: CredentialsServiceType {
+public class CredentialsService: CredentialsServiceType {
     
-    public static var accessibility: KeychainItemAccessibility = .afterFirstUnlock
+    public static var accessibility: KeychainItemAccessibility = .whenUnlocked
     
-    @KeychainOptional(CredentialType.username.rawValue, accessibility: CredentialsService.accessibility)
-    var username: String?
+    @KeychainOptional(CredentialsConstants.username.rawValue, accessibility: CredentialsService.accessibility)
+    public var username: String?
     
-    @KeychainOptional(CredentialType.password.rawValue, accessibility: CredentialsService.accessibility)
-    var password: String?
+    @KeychainOptional(CredentialsConstants.password.rawValue, accessibility: CredentialsService.accessibility)
+    public var password: String?
     
-    @KeychainOptional(CredentialType.bearer.rawValue, accessibility: CredentialsService.accessibility)
-    var bearer: String?
+    @KeychainOptional(CredentialsConstants.bearer.rawValue, accessibility: CredentialsService.accessibility)
+    public var bearer: String?
     
-    @KeychainOptional(CredentialType.oauth.rawValue, accessibility: CredentialsService.accessibility)
-    var oauthToken: AuthToken?
+    @KeychainOptional(CredentialsConstants.oauth.rawValue, accessibility: CredentialsService.accessibility)
+    public var oauthToken: OAuthTokenType?
     
-    public func getCredential<T: Credential> (type: CredentialType) async -> T? {
+    @KeychainOptional(CredentialsConstants.oauth2.rawValue, accessibility: CredentialsService.accessibility)
+    public var oauthToken2: OAuthTokenType?
+    
+    public init() {}
+    
+    public func clearState() {
         
-        switch type {
-            case .username:
-                return self.username as? T
-            case .password:
-                return self.password as? T
-            case .bearer:
-                return self.bearer as? T
-            case .oauth:
-                return self.oauthToken as? T
+        for accessibility in KeychainItemAccessibility.allCases {
+            KeychainWrapper.standard.removeObject(forKey: CredentialsConstants.username.rawValue, withAccessibility: accessibility)
         }
-    }
-    
-    public func setCredential(type: CredentialType, value: Credential?) async {
-        switch (type, value) {
-            case (.username, let value as String):
-                self.username = value
-            case (.username, .none):
-                self.username = nil
-                
-            case (.password, let value as String):
-                self.password = value
-            case (.password, .none):
-                self.password = nil
-            
-            case (.bearer, let value as String):
-                self.bearer = value
-            case (.bearer, .none):
-                self.bearer = nil
-            
-            case (.oauth, let value as AuthToken):
-                self.oauthToken = value
-            case (.oauth, .none):
-                self.oauthToken = nil
-            
-            default:
-                break
+        for accessibility in KeychainItemAccessibility.allCases {
+            KeychainWrapper.standard.removeObject(forKey: CredentialsConstants.password.rawValue, withAccessibility: accessibility)
         }
-    }
-    
-    public func invalidate(type: CredentialType) async {
-        switch type {
-            case .username ,.password, .bearer:
-                for accessibility in KeychainItemAccessibility.allCases {
-                    KeychainWrapper.standard.removeObject(forKey: type.rawValue, withAccessibility: accessibility)
-                }
-            case .oauth:
-                guard let old = self.oauthToken else { return }
-                for accessibility in KeychainItemAccessibility.allCases {
-                    KeychainWrapper.standard.removeObject(forKey: CredentialType.oauth.rawValue, withAccessibility: accessibility)
-                }
-                self.oauthToken = AuthToken(accessToken: "expired",
-                                             accessTokenExpiration: Date.distantPast,
-                                             refreshToken: old.refreshToken)
+        for accessibility in KeychainItemAccessibility.allCases {
+            KeychainWrapper.standard.removeObject(forKey: CredentialsConstants.bearer.rawValue, withAccessibility: accessibility)
+        }
+        for accessibility in KeychainItemAccessibility.allCases {
+            KeychainWrapper.standard.removeObject(forKey: CredentialsConstants.oauth.rawValue, withAccessibility: accessibility)
+        }
+        for accessibility in KeychainItemAccessibility.allCases {
+            KeychainWrapper.standard.removeObject(forKey: CredentialsConstants.oauth2.rawValue, withAccessibility: accessibility)
         }
         
     }
     
-    public func clearState() async {
-        
-        for accessibility in KeychainItemAccessibility.allCases {
-            KeychainWrapper.standard.removeObject(forKey: CredentialType.username.rawValue, withAccessibility: accessibility)
-        }
-        for accessibility in KeychainItemAccessibility.allCases {
-            KeychainWrapper.standard.removeObject(forKey: CredentialType.password.rawValue, withAccessibility: accessibility)
-        }
-        for accessibility in KeychainItemAccessibility.allCases {
-            KeychainWrapper.standard.removeObject(forKey: CredentialType.bearer.rawValue, withAccessibility: accessibility)
-        }
-        for accessibility in KeychainItemAccessibility.allCases {
-            KeychainWrapper.standard.removeObject(forKey: CredentialType.oauth.rawValue, withAccessibility: accessibility)
-        }
-        
+    public enum CredentialsConstants: String {
+        case username, password, bearer, oauth, oauth2
     }
     
 }
 
-public protocol Credential: Codable {}
-
-extension String: Credential {}
-
-extension AuthToken: Credential {}
-
-public enum CredentialType: String {
+public struct OAuthTokenType: Codable {
     
-    case username
-    case password
-    case bearer
-    case oauth
+    public var accessToken: String
+    public var accessTokenExpiration: Date
+    public var refreshToken: String?
+    public var refreshTokenExpiration: Date?
+    
+    public init(accessToken: String, accessTokenExpiration: Date, refreshToken: String? = nil, refreshTokenExpiration: Date? = nil) {
+        self.accessToken = accessToken
+        self.accessTokenExpiration = accessTokenExpiration
+        self.refreshToken = refreshToken
+        self.refreshTokenExpiration = refreshTokenExpiration
+    }
     
 }

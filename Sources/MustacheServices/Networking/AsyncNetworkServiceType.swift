@@ -32,7 +32,7 @@ actor AsyncNetworkService: AsyncNetworkServiceType {
     var tokenService: AsyncTokenServiceType
     
     @LazyInjected
-    var credentialsService: CredentialsServiceType
+    var credentialsService: AsyncCredentialsService
     
     func send<T: Decodable>(endpoint: Endpoint, using decoder: JSONDecoder, retries: Int) async throws -> T {
         
@@ -47,44 +47,46 @@ actor AsyncNetworkService: AsyncNetworkServiceType {
                 do {
                     let token = try await self.tokenService.validToken()
                     request.addValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
-                } catch let error {
-                    let userInfo = [String.errorKey: error]
-                    DispatchQueue.main.async { NotificationCenter.default.post(name: .logOut, object: nil, userInfo: userInfo) }
-                    throw error
+                } catch {
+                    debugPrint("AsyncNetworkService encountered an error: \(error)")
                 }
                 
             } else if endpoint.authentication == .bearer {
                 
                 do {
-                    let token = try await self.tokenService.validToken()
-                    request.addValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
-                } catch let error {
-                    let userInfo = [String.errorKey: error]
-                    DispatchQueue.main.async { NotificationCenter.default.post(name: .logOut, object: nil, userInfo: userInfo) }
-                    throw error
+                    guard let bearer: String = await self.credentialsService.getCredential(type: .bearer) else { throw AuthenticationError.missingBearer }
+                    request.addValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
+                } catch {
+                    
                 }
-                
-                guard let token = self.credentialsService.bearer else { throw AuthenticationError.missingToken}
-                request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
                 
             } else if endpoint.authentication == .basic {
                 
-                guard let username = self.credentialsService.username, let password = self.credentialsService.password else { throw AuthenticationError.missingToken}
-                let raw = String(format: "%@:%@", username, password)
-                let data = raw.data(using: .utf8)!
-                let encoded = data.base64EncodedString()
-                request.addValue("Basic \(encoded)", forHTTPHeaderField: "Authorization")
-                
+                do {
+                    guard let username: String = await self.credentialsService.getCredential(type: .bearer) else { throw AuthenticationError.missingUsername }
+                    guard let password: String = await self.credentialsService.getCredential(type: .bearer) else { throw AuthenticationError.missingPassword }
+                    
+                    let raw = String(format: "%@:%@", username, password)
+                    let data = raw.data(using: .utf8)!
+                    let encoded = data.base64EncodedString()
+                    request.addValue("Basic \(encoded)", forHTTPHeaderField: "Authorization")
+                    
+                } catch {
+                    debugPrint("AsyncNetworkService encountered an error: \(error)")
+                }
+                                
             }
             
             let (data, response) = try await URLSession.shared.data(for: request)
             
             guard let urlResponse = response as? HTTPURLResponse else {
+                debugPrint("AsyncNetworkService encountered an error: invalidResponseType")
                 throw NetworkServiceTypeError.invalidResponseType(response, data)
             }
             
             guard urlResponse.statusCode != 204 else {
                 guard let reply = EmptyReply() as? T else {
+                    debugPrint("AsyncNetworkService encountered an error: invalidResponseType")
                     throw NetworkServiceTypeError.invalidResponseType(response, data)
                 }
                 return reply
@@ -94,15 +96,17 @@ actor AsyncNetworkService: AsyncNetworkServiceType {
                 
                 if urlResponse.statusCode == 401 {
                     if retries >= 1 {
-                        self.credentialsService.invalidate(type: .oauth)
+                        await self.credentialsService.invalidate()
                         return try await self.send(endpoint: endpoint, using: decoder, retries: retries - 1)
                     } else {
                         DispatchQueue.main.async {
                             NotificationCenter.default.post(name: .logOut, object: nil)
                         }
+                        debugPrint("AsyncNetworkService encountered an error: unauthorized")
                         throw NetworkServiceTypeError.unauthorized(data: data)
                     }
                 } else {
+                    debugPrint("AsyncNetworkService encountered an error: unSuccessful")
                     throw NetworkServiceTypeError.unSuccessful(urlResponse, data, urlResponse.statusCode, nil)
                 }
             }
@@ -111,16 +115,18 @@ actor AsyncNetworkService: AsyncNetworkServiceType {
                 let model: T = try decoder.decode(T.self, from: data)
                 return model
             } catch let error {
+                debugPrint("AsyncNetworkService encountered an error: \(error) ")
                 throw NetworkServiceTypeError.decodingError(urlResponse, data, error)
             }
-        } catch let error as NetworkServiceTypeError {
+        } /*catch let error as NetworkServiceTypeError {
             switch error {
                 case .decodingError(_, let data, _), .invalidResponseType(_, let data), .unSuccessful(_, let data, _, _), .unauthorized(let data):
                     guard let data = data else { throw error }
                     guard let response = try? decoder.decode(ErrorResponse.self, from: data) else { throw error }
                     throw response
             }
-        } catch {
+        } */ catch {
+            debugPrint("AsyncNetworkService encountered an error: \(error)")
             throw error
         }
         

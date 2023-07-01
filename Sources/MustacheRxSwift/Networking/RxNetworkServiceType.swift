@@ -4,8 +4,10 @@ import MustacheServices
 import Resolver
 
 public protocol RxNetworkServiceType {
+    
     func send<T: Decodable>(endpoint: Endpoint) -> Single<T>
     func send<T: Decodable>(endpoint: Endpoint, using decoder: JSONDecoder) -> Single<T>
+    
 }
 
 public class RxNetworkService: NSObject, RxNetworkServiceType {
@@ -33,7 +35,7 @@ public class RxNetworkService: NSObject, RxNetworkServiceType {
                     .catch { error in
                         guard let networkError = error as? NetworkServiceTypeError else { throw error }
                         switch networkError {
-                            case .accessTokenExpired:
+                            case .unauthorized(_):
                                 count -= 1
                                 throw RenewTokenError.unauthorized
                             case .unSuccessful(_, _, let code, _):

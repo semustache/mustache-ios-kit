@@ -2,14 +2,7 @@
 import Foundation
 import UIKit
 
-protocol KeyboardHandlingViewController: NSObjectProtocol {
-    
-    var view: UIView! { get }
-    var scrollView: UIScrollView! { get }
-    var containerView: UIView! { get }
-}
-
-extension KeyboardHandlingViewController {
+extension UIViewController {
     
     func configureKeyboardHandling() {
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { [weak self] notification in
@@ -31,27 +24,36 @@ extension KeyboardHandlingViewController {
             let duration: Double = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue
         else { return }
         
+        guard
+            let scrollView = self.view.subViews(type: UIScrollView.self).first,
+            let containerView = scrollView.subviews.first
+        else { return }
+        
         var difference: CGFloat = .leastNonzeroMagnitude
-        let containerViewMaxY = self.containerView.frame.maxY
+        let containerViewMaxY = containerView.frame.maxY
         let keyboardHeight = keyboardSize.height
         let remainderHeight = self.view.bounds.height - keyboardHeight
-        if remainderHeight < containerViewMaxY {
+        if remainderHeight > containerViewMaxY {
             difference = containerViewMaxY - remainderHeight
         }
         
         UIView.animate(withDuration: duration,
                        delay: 0,
                        options: [],
-                       animations: { self.scrollView.contentOffset = CGPoint(x: 0, y: difference) })
+                       animations: { scrollView.contentOffset = CGPoint(x: 0, y: difference) })
     }
     
     func keyboardWillHide(notification: Notification) {
+        
         guard let duration: Double = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue else { return }
+        
+        guard let scrollView = self.view.subViews(type: UIScrollView.self).first
+        else { return }
         
         UIView.animate(withDuration: duration,
                        delay: 0,
                        options: [],
-                       animations: { self.scrollView.contentOffset = .zero })
+                       animations: { scrollView.contentOffset = .zero })
     }
     
 }

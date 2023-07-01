@@ -2,6 +2,9 @@
 import Foundation
 
 enum AuthenticationError: Error {
+    case missingUsername
+    case missingPassword
+    case missingBearer
     case missingToken
     case missingRefreshToken
     case unauthorized
