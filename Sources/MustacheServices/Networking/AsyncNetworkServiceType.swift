@@ -3,7 +3,7 @@ import Foundation
 import Resolver
 
 @available(iOS 13.0.0, *)
-protocol AsyncNetworkServiceType {
+public protocol AsyncNetworkServiceType {
     
     func send<T: Decodable>(endpoint: Endpoint) async throws -> T
     
@@ -13,7 +13,7 @@ protocol AsyncNetworkServiceType {
     
 }
 
-extension AsyncNetworkServiceType {
+public extension AsyncNetworkServiceType {
     
     func send<T: Decodable>(endpoint: Endpoint) async throws -> T {
         return try await self.send(endpoint: endpoint, using: JSONDecoder(), retries: 3)
@@ -26,7 +26,7 @@ extension AsyncNetworkServiceType {
 }
 
 @available(iOS 13.0.0, *)
-actor AsyncNetworkService: AsyncNetworkServiceType {
+public actor AsyncNetworkService: AsyncNetworkServiceType {
     
     @LazyInjected
     var tokenService: AsyncTokenServiceType
@@ -34,7 +34,7 @@ actor AsyncNetworkService: AsyncNetworkServiceType {
     @LazyInjected
     var credentialsService: AsyncCredentialsService
     
-    func send<T: Decodable>(endpoint: Endpoint, using decoder: JSONDecoder, retries: Int) async throws -> T {
+    public func send<T: Decodable>(endpoint: Endpoint, using decoder: JSONDecoder, retries: Int) async throws -> T {
         
         if let demoData = endpoint.demoData as? T { return demoData }
         
@@ -137,14 +137,14 @@ actor AsyncNetworkService: AsyncNetworkServiceType {
     }
 }
 
-extension NSNotification.Name {
+public extension NSNotification.Name {
     
-    public static let logOut = NSNotification.Name("logOut")
+    static let logOut = NSNotification.Name("logOut")
     
 }
 
-extension String {
+public extension String {
     
-    public static let errorKey = NSNotification.Name("errorKey")
+    static let errorKey = NSNotification.Name("errorKey")
     
 }
