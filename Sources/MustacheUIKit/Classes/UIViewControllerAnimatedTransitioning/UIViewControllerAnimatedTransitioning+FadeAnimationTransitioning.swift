@@ -2,15 +2,15 @@
 import Foundation
 import UIKit
 
-protocol FadeTransition { }
+public protocol FadeTransition { }
 
-class FadeAnimationTransitioning: NSObject, UIViewControllerAnimatedTransitioning {
+public class FadeAnimationTransitioning: NSObject, UIViewControllerAnimatedTransitioning {
     
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return 0.75
     }
     
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         
         var temporaryTransitionContext: UIViewControllerContextTransitioning? = transitionContext
         let containerView = transitionContext.containerView

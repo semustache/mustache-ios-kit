@@ -2,24 +2,24 @@
 import Foundation
 import UIKit
 
-protocol ModalPushPopTransion { }
+public protocol ModalPushPopTransion { }
 
-class ModalPushPopAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
+public class ModalPushPopAnimationController: NSObject, UIViewControllerAnimatedTransitioning {
     
     var animated: Bool
     var isPresenting: Bool
     
-    init(animated: Bool, isPresenting: Bool) {
+    public init(animated: Bool, isPresenting: Bool) {
         self.animated = animated
         self.isPresenting = isPresenting
         super.init()
     }
     
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return self.animated ? 0.5 : 0
     }
     
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         
         var temporaryTransitionContext: UIViewControllerContextTransitioning? = transitionContext
         let containerView = transitionContext.containerView
