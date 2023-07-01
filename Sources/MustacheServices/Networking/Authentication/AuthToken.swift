@@ -3,19 +3,29 @@ import Foundation
 
 public struct AuthToken: Codable {
     
-    var accessToken: String
-    var accessTokenExpiration: Date?
-    var refreshToken: String?
-    var refreshTokenExpiration: Date?
+    public var accessToken: String
+    
+    public var accessTokenExpiration: Date?
+    
+    public var refreshToken: String?
+    
+    public var refreshTokenExpiration: Date?
     
 }
 
 public extension AuthToken {
     
-    var isValid: Bool { return !self.accessTokenExpired }
+    var isValid: Bool {
+        return !self.accessTokenExpired
+    }
     
-    var accessTokenExpired: Bool { return (self.accessTokenExpiration ?? .distantFuture) < .now }
-    var refreshTokenExpired: Bool { return (self.refreshTokenExpiration ?? .distantFuture) < .now }
+    var accessTokenExpired: Bool {
+        return (self.accessTokenExpiration ?? .distantFuture) < .now
+    }
+    
+    var refreshTokenExpired: Bool {
+        return (self.refreshTokenExpiration ?? .distantFuture) < .now        
+    }
     
 }
 

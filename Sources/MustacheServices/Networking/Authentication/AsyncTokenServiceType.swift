@@ -8,10 +8,6 @@ public protocol AsyncTokenServiceType: Actor {
     func validToken() async throws -> AuthToken
     
     func refreshToken() async throws -> AuthToken
-    
-    func endpoint(refreshToken: String) -> Endpoint
-    
-    func token(for: Data) -> AuthToken
 }
 
 public actor AsyncTokenService: AsyncTokenServiceType {
@@ -19,6 +15,9 @@ public actor AsyncTokenService: AsyncTokenServiceType {
     @Injected
     var credentialsService: AsyncCredentialsServiceType
     
+    @LazyInjected
+    var refreshTokenService: RefreshTokenServiceType
+        
     var refreshTask: Task<AuthToken, Error>?
     
     public func validToken() async throws -> AuthToken {
@@ -53,7 +52,7 @@ public actor AsyncTokenService: AsyncTokenServiceType {
                 throw AuthenticationError.missingRefreshToken
             }
             
-            let endpoint = self.endpoint(refreshToken: refreshToken)
+            let endpoint = self.refreshTokenService.endpoint(refreshToken: refreshToken)
             let request = endpoint.request()
             
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -63,7 +62,7 @@ public actor AsyncTokenService: AsyncTokenServiceType {
                 throw AuthenticationError.refreshTokenExpired
             }
             
-            let token = self.token(for: data)
+            let token = self.refreshTokenService.token(for: data)
             
             await self.credentialsService.setCredential(type: .oauth, value: token)
             return token
@@ -76,19 +75,30 @@ public actor AsyncTokenService: AsyncTokenServiceType {
         
     }
     
-    public func endpoint(refreshToken: String) -> Endpoint {
-        //        let requestObject = AuthenticationRequest(grantType: .refreshToken, refreshToken: refreshToken)
-        //        let endpoint = AuthenticationEndpoint.token(requestObject)
-        fatalError("Must be overriden")
-    }
     
-    public func token(for: Data) -> AuthToken {
-        //        let authResponse = try JSONDecoder().decode(AuthenticationTokenResponse.self, from: data)
-        //        let token = OAuthTokenType(response: authResponse)
-        fatalError("Must be overriden")
-    }
     
     deinit {
         debugPrint("deinit \(self)")
     }
 }
+
+protocol RefreshTokenServiceType {
+    
+    func endpoint(refreshToken: String) -> Endpoint
+    
+    func token(for data: Data) -> AuthToken
+}
+
+//class RefreshTokenService: RefreshTokenServiceType {
+//
+//    public func endpoint(refreshToken: String) -> Endpoint {
+//        let requestObject = AuthenticationRequest(grantType: .refreshToken, refreshToken: refreshToken)
+//        let endpoint = AuthenticationEndpoint.token(requestObject)
+//    }
+//
+//    public func token(for data: Data) throws -> AuthToken {
+//        let authResponse = try? JSONDecoder().decode(AuthenticationTokenResponse.self, from: data)
+//        let token = OAuthTokenType(response: authResponse)
+//        return token
+//    }
+//}
