@@ -4,22 +4,23 @@ import UIKit
 
 extension UIViewController {
     
-    func configureKeyboardHandling() {
+    public func configureKeyboardHandling() {
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { [weak self] notification in
-            self?.keyboardWillShow(notification: notification)
+            self?.keyboardWillShow(notification: notification as NSNotification)
         }
         
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { [weak self] notification in
-            self?.keyboardWillHide(notification: notification)
+            self?.keyboardWillHide(notification: notification as NSNotification)
         }
     }
     
-    func tearDownKeyboardHandling() {
+    public func tearDownKeyboardHandling() {
         NotificationCenter.default.removeObserver(self)
     }
     
-    func keyboardWillShow(notification: Notification) {
+    @objc open func keyboardWillShow(notification: NSNotification?) {
         guard
+            let notification,
             let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
             let duration: Double = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue
         else { return }
@@ -43,9 +44,11 @@ extension UIViewController {
                        animations: { scrollView.contentOffset = CGPoint(x: 0, y: difference) })
     }
     
-    func keyboardWillHide(notification: Notification) {
+    @objc open func keyboardWillHide(notification: NSNotification?) {
         
-        guard let duration: Double = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue else { return }
+        guard let notification,
+              let duration: Double = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue
+        else { return }
         
         guard let scrollView = self.view.subViews(type: UIScrollView.self).first
         else { return }
