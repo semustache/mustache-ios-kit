@@ -3,7 +3,7 @@ import Foundation
 import MustacheFoundation
 import Resolver
 
-protocol AsyncTokenServiceType: Actor {
+public protocol AsyncTokenServiceType: Actor {
     
     func validToken() async throws -> AuthToken
     
@@ -14,14 +14,14 @@ protocol AsyncTokenServiceType: Actor {
     func token(for: Data) -> AuthToken
 }
 
-actor AsyncTokenService: AsyncTokenServiceType {
+public actor AsyncTokenService: AsyncTokenServiceType {
     
     @Injected
     var credentialsService: AsyncCredentialsServiceType
     
     var refreshTask: Task<AuthToken, Error>?
     
-    func validToken() async throws -> AuthToken {
+    public func validToken() async throws -> AuthToken {
         
         if let handle = self.refreshTask {
             return try await handle.value
@@ -39,7 +39,7 @@ actor AsyncTokenService: AsyncTokenServiceType {
         
     }
     
-    func refreshToken() async throws -> AuthToken {
+    public func refreshToken() async throws -> AuthToken {
         
         if let refreshTask = self.refreshTask {
             return try await refreshTask.value
@@ -76,13 +76,13 @@ actor AsyncTokenService: AsyncTokenServiceType {
         
     }
     
-    func endpoint(refreshToken: String) -> Endpoint {
+    public func endpoint(refreshToken: String) -> Endpoint {
         //        let requestObject = AuthenticationRequest(grantType: .refreshToken, refreshToken: refreshToken)
         //        let endpoint = AuthenticationEndpoint.token(requestObject)
         fatalError("Must be overriden")
     }
     
-    func token(for: Data) -> AuthToken {
+    public func token(for: Data) -> AuthToken {
         //        let authResponse = try JSONDecoder().decode(AuthenticationTokenResponse.self, from: data)
         //        let token = OAuthTokenType(response: authResponse)
         fatalError("Must be overriden")
