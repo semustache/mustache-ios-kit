@@ -5,6 +5,8 @@ public protocol AsyncCredentialsServiceType: AnyActor {
     
     static var accessibility: KeychainItemAccessibility { get set }
     
+    init()
+    
     func getCredential<T: Credential> (type: CredentialType) async -> T?
     
     func setCredential(type: CredentialType, value: Credential?) async
@@ -32,6 +34,8 @@ public actor AsyncCredentialsService: AsyncCredentialsServiceType {
     
     @KeychainOptional(CredentialType.oauth.rawValue, accessibility: AsyncCredentialsService.accessibility)
     var oauthToken: AuthToken?
+    
+    public init() { }
     
     public func getCredential<T: Credential> (type: CredentialType) async -> T? {
         
