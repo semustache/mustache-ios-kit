@@ -13,13 +13,13 @@ open class Button: UIButton {
     
     func tintSiblings() {
         UIView.animate(withDuration: 0.1) {
-            self.siblings.forEach { $0.alpha = 0.5 }
+            self.siblings?.forEach { $0.alpha = 0.5 }
         }
     }
     
     func removeTintSiblings() {
         UIView.animate(withDuration: 0.1) {
-            self.siblings.forEach { $0.alpha = 1.0 }
+            self.siblings?.forEach { $0.alpha = 1.0 }
         }
     }
     
