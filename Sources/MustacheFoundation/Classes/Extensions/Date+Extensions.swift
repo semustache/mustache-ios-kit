@@ -29,7 +29,7 @@ public extension Date {
         
     func startOfMonth() -> Date {
         let startOfDay = Calendar.daDK.startOfDay(for: self)
-        let components = Calendar.daDK.dateComponents([.year, .month], from: self)
+        let components = Calendar.daDK.dateComponents([.year, .month], from: startOfDay)
         let startOfMonth = Calendar.daDK.date(from: components)
         return startOfMonth ?? self
     }
