@@ -5,6 +5,8 @@ import Resolver
 @available(iOS 13.0.0, *)
 public protocol AsyncNetworkServiceType {
     
+    init()
+    
     func send<T: Decodable>(endpoint: Endpoint) async throws -> T
     
     func send<T: Decodable>(endpoint: Endpoint, using decoder: JSONDecoder) async throws -> T
@@ -33,6 +35,8 @@ public actor AsyncNetworkService: AsyncNetworkServiceType {
     
     @LazyInjected
     var credentialsService: AsyncCredentialsService
+    
+    public init() { }
     
     public func send<T: Decodable>(endpoint: Endpoint, using decoder: JSONDecoder, retries: Int) async throws -> T {
         

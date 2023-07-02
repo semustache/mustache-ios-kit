@@ -5,6 +5,8 @@ import Resolver
 
 public protocol AsyncTokenServiceType: Actor {
     
+    init()
+    
     func validToken() async throws -> AuthToken
     
     func refreshToken() async throws -> AuthToken
@@ -19,6 +21,8 @@ public actor AsyncTokenService: AsyncTokenServiceType {
     var refreshTokenService: RefreshTokenServiceType
         
     var refreshTask: Task<AuthToken, Error>?
+        
+    public init() { }
     
     public func validToken() async throws -> AuthToken {
         
