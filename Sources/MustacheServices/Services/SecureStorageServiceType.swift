@@ -36,43 +36,38 @@ protocol SecureStorageServiceType {
     
 }
 
-class SecureStorageService: SecureStorageServiceType {
+public class SecureStorageService: SecureStorageServiceType {
     
-    var passcodeSet: Bool {
+    public var passcodeSet: Bool {
         let context = LAContext()
         var error: NSError?
         context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
         return error?.code != LAError.passcodeNotSet.rawValue
     }
     
-    var biometricsEnabled: Bool {
+    public var biometricsEnabled: Bool {
         let context = LAContext()
         return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
     }
     
-    var isBiometricsLocked: Bool {
+    public var isBiometricsLocked: Bool {
         let context = LAContext()
         var error: NSError?
         context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
         return error?.code == LAError.biometryLockout.rawValue
     }
     
-    var isFaceIdSupported: Bool {
+    public var isFaceIdSupported: Bool {
         let context = LAContext()
         return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) && context.biometryType == .faceID
     }
     
-    var isTouchIdSupported: Bool {
+    public var isTouchIdSupported: Bool {
         let context = LAContext()
         return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) && context.biometryType == .touchID
     }
     
-    var localizedReason: String {
-        let localizedReason = "biometric_login".localized
-        return localizedReason
-    }
-    
-    var tokenStoredWithPin: Bool {
+    public var tokenStoredWithPin: Bool {
         let context = LAContext()
         context.interactionNotAllowed = true
         let query: [CFString: Any] = [
@@ -86,7 +81,7 @@ class SecureStorageService: SecureStorageServiceType {
         return status == errSecInteractionNotAllowed
     }
     
-    var tokenStoredWithBiometry: Bool {
+    public var tokenStoredWithBiometry: Bool {
         let context = LAContext()
         context.interactionNotAllowed = true
         let query: [CFString: Any] = [
@@ -100,7 +95,7 @@ class SecureStorageService: SecureStorageServiceType {
         return status == errSecInteractionNotAllowed // Second option is if biometrics have been locked due to many attempts
     }
     
-    var pinAttempts: Int {
+    private var pinAttempts: Int {
         get {
             return KeychainWrapper.standard.integer(forKey: "pinAttempts", withAccessibility: .afterFirstUnlockThisDeviceOnly) ?? 0
         }
@@ -109,16 +104,21 @@ class SecureStorageService: SecureStorageServiceType {
         }
     }
     
+    private var localizedReason: String {
+        let localizedReason = "biometric_login".localized
+        return localizedReason
+    }
+    
     @Injected(name: .maxPinAttempt)
     private var maxPinAttempts: Int
     
-    init() {
+    public init() {
         self.configure()
     }
     
     private func configure() { }
     
-    func store(data: Data, with pin: String) throws {
+    public func store(data: Data, with pin: String) throws {
             
         var query = self.queryFor(mode: .pin, accessControl: self.accessControl(flags: [.applicationPassword]), context: self.context(pin: pin))
         
@@ -145,7 +145,7 @@ class SecureStorageService: SecureStorageServiceType {
             
     }
     
-    func enableBiometrics() async throws {
+    public func enableBiometrics() async throws {
         
         let context = LAContext()
         let result = try await context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: self.localizedReason)
@@ -153,7 +153,7 @@ class SecureStorageService: SecureStorageServiceType {
         
     }
     
-    func store(data: Data) throws {
+    public func store(data: Data) throws {
         
         var query = self.queryFor(mode: .biometric, accessControl: self.accessControl(flags: [.biometryAny]))
         
@@ -176,7 +176,7 @@ class SecureStorageService: SecureStorageServiceType {
             
     }
     
-    func getData(with pin: String) throws -> Data  {
+    public func getData(with pin: String) throws -> Data  {
         
         var searchQuery = self.queryFor(mode: .pin, context: self.context(pin: pin))
         searchQuery[kSecReturnData] = kCFBooleanTrue as Any
@@ -206,7 +206,7 @@ class SecureStorageService: SecureStorageServiceType {
         
     }
     
-    func getData() async throws -> Data {
+    public func getData() async throws -> Data {
         
         let context = LAContext()
         context.interactionNotAllowed = true
@@ -214,7 +214,7 @@ class SecureStorageService: SecureStorageServiceType {
         // Not allowed
         // context.localizedFallbackTitle = Strings.Localizable.shoppingLocalAuthenticationFallBackMessage
         do {
-            let result =  try await context.evaluateAccessControl(self.accessControl(flags: [.biometryAny])!,
+            let _ =  try await context.evaluateAccessControl(self.accessControl(flags: [.biometryAny])!,
                                                                   operation: .useItem, localizedReason: self.localizedReason)
             var query = self.queryFor(mode: .biometric, accessControl: self.accessControl(flags: [.biometryAny]), context: context)
             query[kSecReturnData] = kCFBooleanTrue as Any
@@ -250,11 +250,17 @@ class SecureStorageService: SecureStorageServiceType {
         
     }
     
-    func clearToken(from mode: UIDStorageMode) {
-        let status = SecItemDelete(self.queryFor(mode: mode) as CFDictionary)
+    public func clearToken(from mode: UIDStorageMode) {
+        let _ = SecItemDelete(self.queryFor(mode: mode) as CFDictionary)
     }
     
-    fileprivate func context(pin: String) -> LAContext {
+    public func reset() {
+        self.clearToken(from: .pin)
+        self.clearToken(from: .biometric)
+        self.pinAttempts = 0
+    }
+        
+    private func context(pin: String) -> LAContext {
         let context = LAContext()
         context.localizedReason = self.localizedReason
         context.interactionNotAllowed = true
@@ -262,13 +268,13 @@ class SecureStorageService: SecureStorageServiceType {
         return context
     }
     
-    fileprivate func accessControl(flags: SecAccessControlCreateFlags) -> SecAccessControl? {
+    private func accessControl(flags: SecAccessControlCreateFlags) -> SecAccessControl? {
         var accessError: Unmanaged<CFError>?
         let access = SecAccessControlCreateWithFlags(nil, kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, flags, &accessError)
         return access
     }
     
-    fileprivate func queryFor(mode: UIDStorageMode, accessControl: SecAccessControl? = nil, context: LAContext? = nil) -> [CFString: Any] {
+    private func queryFor(mode: UIDStorageMode, accessControl: SecAccessControl? = nil, context: LAContext? = nil) -> [CFString: Any] {
         var query: [CFString: Any] = [kSecClass: kSecClassGenericPassword,
                                 kSecAttrService: SecureStorageService.service,
                                 kSecAttrAccount: "\(mode.rawValue)"]
@@ -282,16 +288,6 @@ class SecureStorageService: SecureStorageServiceType {
         return query
     }
     
-    func reset() {
-        self.clearToken(from: .pin)
-        self.clearToken(from: .biometric)
-        self.pinAttempts = 0
-    }
-    
-    @objc
-    func clearState() {
-        
-    }
     
     deinit {
         debugPrint("deinit: \(self)")
@@ -312,11 +308,11 @@ extension Resolver.Name {
     
 }
 
-enum UIDStorageMode: String {
+public enum UIDStorageMode: String {
     case pin
     case biometric
 }
 
-enum SecureStorageError: Error {
+public enum SecureStorageError: Error {
     case uncodable, userCancelled, biometricsNotEnabled, biometricsLocked, unhandled, toManyAttempts, pinNotMatched
 }
