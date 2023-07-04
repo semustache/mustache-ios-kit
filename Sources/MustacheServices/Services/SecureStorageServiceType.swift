@@ -16,9 +16,9 @@ protocol SecureStorageServiceType {
     
     var isTouchIdSupported: Bool { get }
     
-    var tokenStoredWithPin: Bool { get }
+    var dataStoredWithPin: Bool { get }
     
-    var tokenStoredWithBiometry: Bool { get }
+    var dataStoredWithBiometry: Bool { get }
     
     func store(data: Data, with pin: String) throws
     
@@ -67,7 +67,7 @@ public class SecureStorageService: SecureStorageServiceType {
         return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) && context.biometryType == .touchID
     }
     
-    public var tokenStoredWithPin: Bool {
+    public var dataStoredWithPin: Bool {
         let context = LAContext()
         context.interactionNotAllowed = true
         let query: [CFString: Any] = [
@@ -81,7 +81,7 @@ public class SecureStorageService: SecureStorageServiceType {
         return status == errSecInteractionNotAllowed
     }
     
-    public var tokenStoredWithBiometry: Bool {
+    public var dataStoredWithBiometry: Bool {
         let context = LAContext()
         context.interactionNotAllowed = true
         let query: [CFString: Any] = [
@@ -288,6 +288,53 @@ public class SecureStorageService: SecureStorageServiceType {
         return query
     }
     
+    deinit {
+        debugPrint("deinit: \(self)")
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+}
+
+public class SimulatorSecureStorageService: SecureStorageService {
+    
+    @UserDefault("SimulatorSecureStorageService.storage", defaultValue: [:])
+    private var storage: [UIDStorageMode: Data]
+    
+    override public var dataStoredWithPin: Bool {
+        return self.storage[.pin].exists
+    }
+    
+    override public var dataStoredWithBiometry: Bool {
+        return self.storage[.biometric].exists
+    }
+    
+    override public init() { }
+    
+    override public func store(data: Data, with pin: String) throws {
+        var storage = self.storage
+        storage[.pin] = data
+        self.storage = storage
+    }
+    
+    override public func store(data: Data) throws {
+        var storage = self.storage
+        storage[.biometric] = data
+        self.storage = storage
+    }
+    
+    override public func getData(with pin: String) throws -> Data  {
+        return self.storage[.pin] ?? Data()
+    }
+    
+    override public func getData() async throws -> Data {
+        return self.storage[.biometric] ?? Data()
+    }
+    
+    override public func clearToken(from mode: UIDStorageMode) {
+        var storage = self.storage
+        storage[mode] = nil
+        self.storage = storage
+    }
     
     deinit {
         debugPrint("deinit: \(self)")
@@ -308,7 +355,7 @@ extension Resolver.Name {
     
 }
 
-public enum UIDStorageMode: String {
+public enum UIDStorageMode: String, Codable {
     case pin
     case biometric
 }

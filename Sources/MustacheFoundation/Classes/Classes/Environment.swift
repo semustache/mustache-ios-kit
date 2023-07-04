@@ -21,6 +21,14 @@ public struct Environment {
         let info = infoForKey("ENVIRONMENT_CLIENT_SECRET")
         return info
     }
+    
+    public static var isSimulator: Bool {
+        #if targetEnvironment(simulator)
+            return true
+        #else
+            return false
+        #endif
+    }
 
 }
 
