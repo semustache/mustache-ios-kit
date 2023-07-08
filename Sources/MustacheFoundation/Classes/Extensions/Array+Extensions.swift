@@ -2,7 +2,7 @@
 import Foundation
 
 public extension Array where Element: Equatable {
-
+    
     mutating func rearrange(fromIndex: Int, toIndex: Int) {
         let element = self.remove(at: fromIndex)
         self.insert(element, at: toIndex)
@@ -75,4 +75,12 @@ public extension Array {
 public extension ArraySlice {
     
     var array: [Element] { return Array(self) }
+}
+
+public extension Array where Element: Hashable {
+    
+    var set: Set<Element> {
+        return Set(self)
+    }
+    
 }
