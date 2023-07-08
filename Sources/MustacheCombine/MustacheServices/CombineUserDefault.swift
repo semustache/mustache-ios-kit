@@ -30,7 +30,7 @@ public class UserDefaultC<T: Codable>: NSObject {
     private var observerContext = 0
     private let subject: CurrentValueSubject<T, Never>
     
-    public init(wrappedValue defaultValue: T, _ key: String, userDefaults: UserDefaults = .standard) {
+    public init(_ key: String, defaultValue: T , userDefaults: UserDefaults = .standard) {
         self.key = key
         self.userDefaults = userDefaults
         self.subject = CurrentValueSubject(defaultValue)
