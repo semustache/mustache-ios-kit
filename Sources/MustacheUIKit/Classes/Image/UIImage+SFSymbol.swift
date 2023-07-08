@@ -14,11 +14,11 @@ public extension SFSymbol {
 
 public extension UIImage {
     
-    convenience init?(systemName symbol: SFSymbol) {
-        self.init(systemName: symbol.name)
+    convenience init?(systemName symbol: SFSymbol, config: UIImage.SymbolConfiguration? = nil) {
+        self.init(systemName: symbol.name, withConfiguration: config)
     }
     
-    convenience init?(symbol: SFSymbol) {
-        self.init(systemName: symbol.name)
+    convenience init?(symbol: SFSymbol, config: UIImage.SymbolConfiguration? = nil) {
+        self.init(systemName: symbol.name, withConfiguration: config)
     }
 }
