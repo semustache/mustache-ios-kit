@@ -86,7 +86,7 @@ public actor AsyncTokenService: AsyncTokenServiceType {
     }
 }
 
-protocol RefreshTokenServiceType {
+public protocol RefreshTokenServiceType {
     
     func endpoint(refreshToken: String) -> Endpoint
     
