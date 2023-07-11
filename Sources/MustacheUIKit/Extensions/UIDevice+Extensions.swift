@@ -1,7 +1,7 @@
 
 import UIKit
 
-extension UIDevice {
+public extension UIDevice {
     
     var modelIdentifier: String? {
         if let simulatorModelIdentifier = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] {
