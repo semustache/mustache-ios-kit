@@ -66,7 +66,7 @@ public actor AsyncTokenService: AsyncTokenServiceType {
                 throw AuthenticationError.refreshTokenExpired
             }
             
-            let token = self.refreshTokenService.token(for: data)
+            let token = try self.refreshTokenService.token(for: data)
             
             await self.credentialsService.setCredential(type: .oauth, value: token)
             return token
@@ -90,19 +90,20 @@ public protocol RefreshTokenServiceType {
     
     func endpoint(refreshToken: String) -> Endpoint
     
-    func token(for data: Data) -> AuthToken
+    func token(for data: Data) throws -> AuthToken
 }
 
-//class RefreshTokenService: RefreshTokenServiceType {
+//extension AsyncNetworkService: RefreshTokenServiceType {
 //
-//    public func endpoint(refreshToken: String) -> Endpoint {
-//        let requestObject = AuthenticationRequest(grantType: .refreshToken, refreshToken: refreshToken)
-//        let endpoint = AuthenticationEndpoint.token(requestObject)
+//    nonisolated public func endpoint(refreshToken: String) -> Endpoint {
+//        let request = AccessTokenRequest(refreshToken: refreshToken)
+//        let endpoint = AuthenticationEndpoint.accessToken(request)
+//        return endpoint
 //    }
 //
-//    public func token(for data: Data) throws -> AuthToken {
-//        let authResponse = try? JSONDecoder().decode(AuthenticationTokenResponse.self, from: data)
-//        let token = OAuthTokenType(response: authResponse)
+//    nonisolated public func token(for data: Data) throws -> AuthToken {
+//        let authResponse = try JSONDecoder().decode(LoginResponse.self, from: data)
+//        let token = AuthToken(response: authResponse)
 //        return token
 //    }
 //}
