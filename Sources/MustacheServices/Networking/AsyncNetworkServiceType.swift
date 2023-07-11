@@ -34,7 +34,7 @@ public actor AsyncNetworkService: AsyncNetworkServiceType {
     var tokenService: AsyncTokenServiceType
     
     @LazyInjected
-    var credentialsService: AsyncCredentialsService
+    var credentialsService: AsyncCredentialsServiceType
     
     public init() { }
     
