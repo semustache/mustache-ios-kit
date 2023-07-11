@@ -4,7 +4,7 @@ import Foundation
 public enum EncodingType {
     
     case none
-    case json
+    case json(JSONEncoder? = nil)
     case urlEncoded
     case multipartFormData
     case data

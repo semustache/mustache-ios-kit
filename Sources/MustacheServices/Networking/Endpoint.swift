@@ -82,12 +82,12 @@ public extension Endpoint {
             case .none:
                 break
                 
-            case .json:
+            case .json(let encoder):
                 
                 guard let body = self.body as? Encodable else { fatalError("Unable to cast body as Encodable") }
                 
                 let wrapper = EncodableWrapper(body)
-                let encoder = JSONEncoder()
+                let encoder = encoder ?? JSONEncoder()
                 guard let data = try? encoder.encode(wrapper) else { fatalError("Unable to encode body \(body)") }
                 
                 request.httpBody = data
