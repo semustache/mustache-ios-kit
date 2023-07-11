@@ -11,6 +11,13 @@ public struct AuthToken: Codable {
     
     public var refreshTokenExpiration: Date?
     
+    public init(accessToken: String, accessTokenExpiration: Date? = nil, refreshToken: String? = nil, refreshTokenExpiration: Date? = nil) {
+        self.accessToken = accessToken
+        self.accessTokenExpiration = accessTokenExpiration
+        self.refreshToken = refreshToken
+        self.refreshTokenExpiration = refreshTokenExpiration
+    }
+    
 }
 
 public extension AuthToken {
