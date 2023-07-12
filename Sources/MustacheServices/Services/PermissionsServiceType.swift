@@ -58,14 +58,18 @@ public class PermissionsService: NSObject, PermissionsServiceType {
         return try await withCheckedThrowingContinuation { [weak self] continuation in
             guard let self = self else { return }
             self.locationContinuation = continuation
-            self.locationManager.delegate = self
-            self.locationManager.requestAlwaysAuthorization()
             
-            Timer.scheduledTimer(timeInterval: 3,
-                                 target: self,
-                                 selector: #selector(PermissionsService.locationManagerTimeout),
-                                 userInfo: nil,
-                                 repeats: false)
+            DispatchQueue.main.async {
+                self.locationManager.delegate = self
+                self.locationManager.requestAlwaysAuthorization()
+                
+                Timer.scheduledTimer(timeInterval: 3,
+                                     target: self,
+                                     selector: #selector(PermissionsService.locationManagerTimeout),
+                                     userInfo: nil,
+                                     repeats: false)
+                
+            }
         }
     }
     
@@ -83,13 +87,16 @@ public class PermissionsService: NSObject, PermissionsServiceType {
         return try await withCheckedThrowingContinuation { [weak self] continuation in
             guard let self = self else { return }
             self.peripheralContinuation = continuation
-            self.peripheralManager.delegate = self
             
-            Timer.scheduledTimer(timeInterval: 3,
-                                 target: self,
-                                 selector: #selector(PermissionsService.peripheralManagerTimeout),
-                                 userInfo: nil,
-                                 repeats: false)
+            DispatchQueue.main.async {
+                self.peripheralManager.delegate = self
+                
+                Timer.scheduledTimer(timeInterval: 3,
+                                     target: self,
+                                     selector: #selector(PermissionsService.peripheralManagerTimeout),
+                                     userInfo: nil,
+                                     repeats: false)
+            }
         }
     }
     
