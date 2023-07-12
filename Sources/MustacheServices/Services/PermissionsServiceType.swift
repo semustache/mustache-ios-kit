@@ -55,10 +55,17 @@ public class PermissionsService: NSObject, PermissionsServiceType {
     private lazy var peripheralManager: CBPeripheralManager = { return CBPeripheralManager() }()
     
     public func locationPermission() async throws -> Bool {
-        return try await withCheckedThrowingContinuation { continuation in
-            locationContinuation = continuation
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            guard let self = self else { return }
+            self.locationContinuation = continuation
             self.locationManager.delegate = self
             self.locationManager.requestAlwaysAuthorization()
+            
+            Timer.scheduledTimer(timeInterval: 3,
+                                 target: self,
+                                 selector: #selector(PermissionsService.locationManagerTimeout),
+                                 userInfo: nil,
+                                 repeats: false)
         }
     }
     
@@ -73,9 +80,16 @@ public class PermissionsService: NSObject, PermissionsServiceType {
     }
     
     public func bluetoothPermission() async throws -> Bool {
-        return try await withCheckedThrowingContinuation { continuation in
-            peripheralContinuation = continuation
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            guard let self = self else { return }
+            self.peripheralContinuation = continuation
             self.peripheralManager.delegate = self
+            
+            Timer.scheduledTimer(timeInterval: 3,
+                                 target: self,
+                                 selector: #selector(PermissionsService.peripheralManagerTimeout),
+                                 userInfo: nil,
+                                 repeats: false)
         }
     }
     
@@ -85,6 +99,21 @@ public class PermissionsService: NSObject, PermissionsServiceType {
 }
 
 extension PermissionsService: CLLocationManagerDelegate {
+    
+    @objc public func locationManagerTimeout() {
+        self.locationContinuation?.resume(returning: false)
+    }
+    
+    public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        switch manager.authorizationStatus {
+            case .notDetermined, .restricted, .denied:
+                self.locationContinuation?.resume(returning: false)
+            case .authorizedAlways, .authorizedWhenInUse:
+                self.locationContinuation?.resume(returning: true)
+            @unknown default:
+                self.locationContinuation?.resume(returning: false)
+        }
+    }
     
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         switch status {
@@ -107,15 +136,19 @@ extension PermissionsService: CLLocationManagerDelegate {
 
 extension PermissionsService: CBPeripheralManagerDelegate {
     
+    @objc public func peripheralManagerTimeout() {
+        self.peripheralContinuation?.resume(returning: false)
+    }
+    
     public func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         guard peripheral.state != .unknown else { return }
         switch CBCentralManager.authorization {
             case .notDetermined, .restricted, .denied:
-                self.locationContinuation?.resume(returning: false)
+                self.peripheralContinuation?.resume(returning: false)
             case .allowedAlways:
-                self.locationContinuation?.resume(returning: true)
+                self.peripheralContinuation?.resume(returning: true)
             @unknown default:
-                self.locationContinuation?.resume(returning: false)
+                self.peripheralContinuation?.resume(returning: false)
         }
     }
 }
