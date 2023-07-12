@@ -17,6 +17,12 @@ public final class SwipeNavigationController: UINavigationController {
             return self.forwardingDelegate
         }
     }
+    
+    convenience public init(forwardingDelegate: UINavigationControllerDelegate?) {
+        self.init(nibName: nil, bundle: nil)
+        super.delegate = self
+        self.forwardingDelegate = forwardingDelegate
+    }
 
     convenience public init() {
         self.init(nibName: nil, bundle: nil)
@@ -40,9 +46,12 @@ public final class SwipeNavigationController: UINavigationController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
-
-        // This needs to be in here, not in init
+        self.configure()
+    }
+    
+    func configure() {
         self.interactivePopGestureRecognizer?.delegate = self
+        self.setNavigationBarHidden(true, animated: false)
     }
 
     deinit {
