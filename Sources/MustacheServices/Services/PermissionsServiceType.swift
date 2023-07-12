@@ -63,7 +63,7 @@ public class PermissionsService: NSObject, PermissionsServiceType {
                 self.locationManager.delegate = self
                 self.locationManager.requestAlwaysAuthorization()
                 
-                Timer.scheduledTimer(timeInterval: 3,
+                Timer.scheduledTimer(timeInterval: 30,
                                      target: self,
                                      selector: #selector(PermissionsService.locationManagerTimeout),
                                      userInfo: nil,
@@ -91,7 +91,7 @@ public class PermissionsService: NSObject, PermissionsServiceType {
             DispatchQueue.main.async {
                 self.peripheralManager.delegate = self
                 
-                Timer.scheduledTimer(timeInterval: 3,
+                Timer.scheduledTimer(timeInterval: 30,
                                      target: self,
                                      selector: #selector(PermissionsService.peripheralManagerTimeout),
                                      userInfo: nil,
