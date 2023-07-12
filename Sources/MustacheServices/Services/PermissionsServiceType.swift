@@ -109,6 +109,7 @@ extension PermissionsService: CLLocationManagerDelegate {
     
     @objc public func locationManagerTimeout() {
         self.locationContinuation?.resume(returning: false)
+        self.locationContinuation = nil
     }
     
     public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -120,6 +121,7 @@ extension PermissionsService: CLLocationManagerDelegate {
             @unknown default:
                 self.locationContinuation?.resume(returning: false)
         }
+        self.locationContinuation = nil
     }
     
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
@@ -131,12 +133,14 @@ extension PermissionsService: CLLocationManagerDelegate {
             @unknown default:
                 self.locationContinuation?.resume(returning: false)
         }
+        self.locationContinuation = nil
     }
     
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         if let error = error as? CLError, error.code == .denied {
             self.locationContinuation?.resume(throwing: error)
         }
+        self.locationContinuation = nil
     }
     
 }
@@ -145,6 +149,7 @@ extension PermissionsService: CBPeripheralManagerDelegate {
     
     @objc public func peripheralManagerTimeout() {
         self.peripheralContinuation?.resume(returning: false)
+        self.peripheralContinuation = nil
     }
     
     public func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
@@ -157,5 +162,6 @@ extension PermissionsService: CBPeripheralManagerDelegate {
             @unknown default:
                 self.peripheralContinuation?.resume(returning: false)
         }
+        self.peripheralContinuation = nil
     }
 }
