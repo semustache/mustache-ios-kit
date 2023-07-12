@@ -2,7 +2,7 @@
 import Foundation
 import UIKit
 
-final class SwipeNavigationController: UINavigationController {
+public final class SwipeNavigationController: UINavigationController {
 
     // MARK: - Lifecycle
 
@@ -10,7 +10,7 @@ final class SwipeNavigationController: UINavigationController {
     var _supportedInterfaceOrientations: UIInterfaceOrientationMask = [.portrait]
     weak var forwardingDelegate: UINavigationControllerDelegate? = nil
 
-    override var delegate: UINavigationControllerDelegate? {
+    override public var delegate: UINavigationControllerDelegate? {
         set {
             self.forwardingDelegate = newValue
         } get {
@@ -18,17 +18,17 @@ final class SwipeNavigationController: UINavigationController {
         }
     }
 
-    convenience init() {
+    convenience public init() {
         self.init(nibName: nil, bundle: nil)
         super.delegate = self
     }
 
-    override init(rootViewController: UIViewController) {
+    override public init(rootViewController: UIViewController) {
         super.init(rootViewController: rootViewController)
         super.delegate = self
     }
 
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    override public init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         super.delegate = self
     }
@@ -38,7 +38,7 @@ final class SwipeNavigationController: UINavigationController {
         super.delegate = self
     }
 
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         // This needs to be in here, not in init
@@ -52,7 +52,7 @@ final class SwipeNavigationController: UINavigationController {
 
     // MARK: - Overrides
 
-    override func pushViewController(_ viewController: UIViewController, animated: Bool) {
+    override public func pushViewController(_ viewController: UIViewController, animated: Bool) {
         self.duringPushAnimation = true
         super.pushViewController(viewController, animated: animated)
     }
@@ -67,29 +67,29 @@ final class SwipeNavigationController: UINavigationController {
 
 extension SwipeNavigationController: UINavigationControllerDelegate {
 
-    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+    public func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         self.forwardingDelegate?.navigationController?(navigationController, willShow: viewController, animated: animated)
     }
 
-    func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
+    public func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
         guard let swipeNavigationController = navigationController as? SwipeNavigationController else { return }
         swipeNavigationController.duringPushAnimation = false
         self.forwardingDelegate?.navigationController?(navigationController, didShow: viewController, animated: animated)
     }
 
-    func navigationControllerSupportedInterfaceOrientations(_ navigationController: UINavigationController) -> UIInterfaceOrientationMask {
+    public func navigationControllerSupportedInterfaceOrientations(_ navigationController: UINavigationController) -> UIInterfaceOrientationMask {
         return self.forwardingDelegate?.navigationControllerSupportedInterfaceOrientations?(navigationController) ?? self._supportedInterfaceOrientations
     }
 
-    func navigationControllerPreferredInterfaceOrientationForPresentation(_ navigationController: UINavigationController) -> UIInterfaceOrientation {
+    public func navigationControllerPreferredInterfaceOrientationForPresentation(_ navigationController: UINavigationController) -> UIInterfaceOrientation {
         return self.forwardingDelegate?.navigationControllerPreferredInterfaceOrientationForPresentation?(navigationController) ?? self._preferredInterfaceOrientationForPresentation
     }
 
-    func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    public func navigationController(_ navigationController: UINavigationController, interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         return self.forwardingDelegate?.navigationController?(navigationController, interactionControllerFor: animationController)
     }
 
-    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    public func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return self.forwardingDelegate?.navigationController?(navigationController, animationControllerFor: operation, from: fromVC, to: toVC)
     }
 
@@ -99,7 +99,7 @@ extension SwipeNavigationController: UINavigationControllerDelegate {
 
 extension SwipeNavigationController: UIGestureRecognizerDelegate {
 
-    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         guard gestureRecognizer == self.interactivePopGestureRecognizer else { return true } // default value
 
         // Disable pop gesture in two situations:
