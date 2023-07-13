@@ -56,7 +56,7 @@ public actor AsyncTokenService: AsyncTokenServiceType {
                 throw AuthenticationError.missingRefreshToken
             }
             
-            let endpoint = self.refreshTokenService.endpoint(refreshToken: refreshToken)
+            let endpoint = try self.refreshTokenService.endpoint(refreshToken: refreshToken)
             let request = endpoint.request()
             
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -79,8 +79,6 @@ public actor AsyncTokenService: AsyncTokenServiceType {
         
     }
     
-    
-    
     deinit {
         debugPrint("deinit \(self)")
     }
@@ -88,14 +86,14 @@ public actor AsyncTokenService: AsyncTokenServiceType {
 
 public protocol RefreshTokenServiceType {
     
-    func endpoint(refreshToken: String) -> Endpoint
+    func endpoint(refreshToken: String) throws -> Endpoint
     
     func token(for data: Data) throws -> AuthToken
 }
 
 //extension AsyncNetworkService: RefreshTokenServiceType {
 //
-//    nonisolated public func endpoint(refreshToken: String) -> Endpoint {
+//    nonisolated public func endpoint(refreshToken: String) throws -> Endpoint {
 //        let request = AccessTokenRequest(refreshToken: refreshToken)
 //        let endpoint = AuthenticationEndpoint.accessToken(request)
 //        return endpoint
