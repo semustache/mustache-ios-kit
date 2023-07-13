@@ -116,6 +116,9 @@ public actor AsyncNetworkService: AsyncNetworkServiceType {
             }
             
             do {
+                // The response might not have any data instead of an empty dictionary
+                if let reply = EmptyReply() as? T { return reply }
+
                 let model: T = try decoder.decode(T.self, from: data)
                 return model
             } catch let error {
