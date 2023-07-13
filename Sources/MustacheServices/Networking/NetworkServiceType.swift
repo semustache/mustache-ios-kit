@@ -78,6 +78,9 @@ public class NetworkService: NetworkServiceType {
         }
         
         do {
+            // The response might not have any data instead of an empty dictionary
+            if let reply = EmptyReply() as? T { completionHandler(.success(reply)) } 
+            
             let model: T = try decoder.decode(T.self, from: data ?? Data())
             completionHandler(.success(model))
         } catch let error {
