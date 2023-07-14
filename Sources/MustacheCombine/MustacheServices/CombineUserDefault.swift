@@ -36,7 +36,7 @@ public class UserDefaultC<T: Codable>: NSObject {
         self.subject = CurrentValueSubject(defaultValue)
         super.init()
         self.userDefaults.register(defaults: [key: defaultValue])
-        self.userDefaults.addObserver(self, forKeyPath: self.key, options: .new, context: &observerContext)
+        self.userDefaults.addObserver(self, forKeyPath: self.key, options: [.initial, .new], context: &observerContext)
         self.subject.value = defaultValue
     }
     
@@ -83,7 +83,7 @@ public  class UserDefaultCOptional<T: Codable>: NSObject {
         self.userDefaults = userDefaults
         self.subject = CurrentValueSubject(nil)
         super.init()
-        self.userDefaults.addObserver(self, forKeyPath: self.key, options: .new, context: &observerContext)
+        self.userDefaults.addObserver(self, forKeyPath: self.key, options: [.initial, .new], context: &observerContext)
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
