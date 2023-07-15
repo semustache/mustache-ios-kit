@@ -18,6 +18,7 @@ public class UserDefaultC<T: Codable>: NSObject {
             if let encoded: Data = try? JSONEncoder().encode(newValue) {
                 self.userDefaults.set(encoded, forKey: self.key)
             }
+            NotificationCenter.default.post(name: notificationName(key: self.key), object: nil)
         }
     }
 
@@ -27,30 +28,26 @@ public class UserDefaultC<T: Codable>: NSObject {
     
     private let key: String
     private let userDefaults: UserDefaults
-    private var observerContext = 0
     private let subject: CurrentValueSubject<T, Never>
+    private var localeChangeObserver: NSObjectProtocol!
     
     public init(_ key: String, defaultValue: T , userDefaults: UserDefaults = .standard) {
         self.key = key
         self.userDefaults = userDefaults
         self.subject = CurrentValueSubject(defaultValue)
         super.init()
-        self.userDefaults.register(defaults: [key: defaultValue])
-        self.userDefaults.addObserver(self, forKeyPath: self.key, options: [.initial, .new], context: &observerContext)
-        self.subject.value = defaultValue
-    }
-    
-    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-            if context == &observerContext {
-                self.subject.value = self.wrappedValue
-            } else {
-                super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-            }
+        self.localeChangeObserver = NotificationCenter.default.addObserver(forName: notificationName(key: key),
+                                                                           object: nil,
+                                                                           queue: .main) { [unowned self] _ in
+            self.subject.value = self.wrappedValue
+        }
+        self.subject.value = self.wrappedValue        
     }
     
     deinit {
-        self.userDefaults.removeObserver(self, forKeyPath: key, context: &observerContext)
+        NotificationCenter.default.removeObserver(self.localeChangeObserver as Any)
     }
+    
 }
 
 @propertyWrapper
@@ -65,7 +62,10 @@ public  class UserDefaultCOptional<T: Codable>: NSObject {
         set {
             if let newValue, let encoded: Data = try? JSONEncoder().encode(newValue) {
                 self.userDefaults.set(encoded, forKey: self.key)
+            } else {
+                self.userDefaults.removeObject(forKey: self.key)
             }
+            NotificationCenter.default.post(name: notificationName(key: self.key), object: nil)
         }
     }
     
@@ -75,27 +75,30 @@ public  class UserDefaultCOptional<T: Codable>: NSObject {
     
     private let key: String
     private let userDefaults: UserDefaults
-    private var observerContext = 0
     private let subject: CurrentValueSubject<T?, Never>
+    private var localeChangeObserver: NSObjectProtocol!
     
     public init(key: String, userDefaults: UserDefaults = .standard) {
         self.key = key
         self.userDefaults = userDefaults
         self.subject = CurrentValueSubject(nil)
         super.init()
-        self.userDefaults.addObserver(self, forKeyPath: self.key, options: [.initial, .new], context: &observerContext)
-    }
-    
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if context == &observerContext {
+        self.localeChangeObserver = NotificationCenter.default.addObserver(forName: notificationName(key: key),
+                                                                           object: nil,
+                                                                           queue: .main) { [unowned self] _ in
             self.subject.value = self.wrappedValue
-        } else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
+        self.subject.value = self.wrappedValue
     }
+
     
     deinit {
-        self.userDefaults.removeObserver(self, forKeyPath: key, context: &observerContext)
+        NotificationCenter.default.removeObserver(self.localeChangeObserver as Any)
     }
 }
 
+func notificationName(key: String) -> NSNotification.Name {
+    let rawValue = "\(UserDefaults.didChangeNotification)-\(key)"
+    let notificationName = NSNotification.Name(rawValue: rawValue)
+    return notificationName
+}
