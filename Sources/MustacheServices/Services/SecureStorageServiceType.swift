@@ -30,7 +30,7 @@ protocol SecureStorageServiceType {
     
     func getData() async throws -> Data
     
-    func clearToken(from: UIDStorageMode)
+    func clearData(from: UIDStorageMode)
     
     func reset()
     
@@ -72,7 +72,7 @@ public class SecureStorageService: SecureStorageServiceType {
         context.interactionNotAllowed = true
         let query: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
-            kSecAttrService: SecureStorageService.service,
+            kSecAttrService: self.secAttrService,
             kSecAttrAccount: "\(UIDStorageMode.pin.rawValue)",
             kSecUseAuthenticationContext: context
         ]
@@ -86,7 +86,7 @@ public class SecureStorageService: SecureStorageServiceType {
         context.interactionNotAllowed = true
         let query: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
-            kSecAttrService: SecureStorageService.service,
+            kSecAttrService: self.secAttrService,
             kSecAttrAccount: "\(UIDStorageMode.biometric.rawValue)",
             kSecUseAuthenticationContext: context
         ]
@@ -112,7 +112,14 @@ public class SecureStorageService: SecureStorageServiceType {
     @Injected(name: .maxPinAttempt)
     private var maxPinAttempts: Int
     
-    public init() {
+    private var key: String
+    
+    private var secAttrService: String {
+        "SecureStorageService.service-\(self.key)"
+    }
+    
+    public init(key: String = "Data") {
+        self.key = key
         self.configure()
     }
     
@@ -191,8 +198,8 @@ public class SecureStorageService: SecureStorageServiceType {
             var attempts = self.pinAttempts
             attempts += 1
             if attempts >= 10 {
-                self.clearToken(from: .pin)
-                self.clearToken(from: .biometric)
+                self.clearData(from: .pin)
+                self.clearData(from: .biometric)
                 self.pinAttempts = 0
                 throw SecureStorageError.toManyAttempts
             } else {
@@ -250,13 +257,13 @@ public class SecureStorageService: SecureStorageServiceType {
         
     }
     
-    public func clearToken(from mode: UIDStorageMode) {
+    public func clearData(from mode: UIDStorageMode) {
         let _ = SecItemDelete(self.queryFor(mode: mode) as CFDictionary)
     }
     
     public func reset() {
-        self.clearToken(from: .pin)
-        self.clearToken(from: .biometric)
+        self.clearData(from: .pin)
+        self.clearData(from: .biometric)
         self.pinAttempts = 0
     }
         
@@ -276,7 +283,7 @@ public class SecureStorageService: SecureStorageServiceType {
     
     private func queryFor(mode: UIDStorageMode, accessControl: SecAccessControl? = nil, context: LAContext? = nil) -> [CFString: Any] {
         var query: [CFString: Any] = [kSecClass: kSecClassGenericPassword,
-                                kSecAttrService: SecureStorageService.service,
+                                kSecAttrService: self.secAttrService,
                                 kSecAttrAccount: "\(mode.rawValue)"]
         
         if let accessControl = accessControl {
@@ -308,7 +315,9 @@ public class SimulatorSecureStorageService: SecureStorageService {
         return self.storage[.biometric].exists
     }
     
-    override public init() { }
+    override public init(key: String) {
+        super.init(key: key)
+    }
     
     override public func store(data: Data, with pin: String) throws {
         var storage = self.storage
@@ -330,7 +339,7 @@ public class SimulatorSecureStorageService: SecureStorageService {
         return self.storage[.biometric] ?? Data()
     }
     
-    override public func clearToken(from mode: UIDStorageMode) {
+    override public func clearData(from mode: UIDStorageMode) {
         var storage = self.storage
         storage[mode] = nil
         self.storage = storage
