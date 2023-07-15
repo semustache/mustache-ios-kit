@@ -1,4 +1,5 @@
 import Foundation
+import MustacheFoundation
 
 public protocol Endpoint {
 
@@ -87,7 +88,9 @@ public extension Endpoint {
                 guard let body = self.body as? Encodable else { fatalError("Unable to cast body as Encodable") }
                 
                 let wrapper = EncodableWrapper(body)
-                let encoder = encoder ?? JSONEncoder()
+                let encoder = encoder ?? JSONEncoder().configured({ (encoder: JSONEncoder) in
+                    encoder.dateEncodingStrategy = .iso8601
+                })
                 guard let data = try? encoder.encode(wrapper) else { fatalError("Unable to encode body \(body)") }
                 
                 request.httpBody = data

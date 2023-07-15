@@ -16,3 +16,9 @@ public extension InlineConfigurable {
 
 extension NSObject: InlineConfigurable {
 }
+
+extension JSONDecoder: InlineConfigurable {
+}
+
+extension JSONEncoder: InlineConfigurable {
+}

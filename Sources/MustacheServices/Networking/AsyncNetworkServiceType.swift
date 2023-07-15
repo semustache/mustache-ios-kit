@@ -18,7 +18,9 @@ public protocol AsyncNetworkServiceType {
 public extension AsyncNetworkServiceType {
     
     func send<T: Decodable>(endpoint: Endpoint) async throws -> T {
-        return try await self.send(endpoint: endpoint, using: JSONDecoder(), retries: 3)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try await self.send(endpoint: endpoint, using: decoder, retries: 3)
     }
     
     func send<T: Decodable>(endpoint: Endpoint, using decoder: JSONDecoder) async throws -> T {
