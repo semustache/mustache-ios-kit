@@ -358,7 +358,7 @@ extension SecureStorageService {
     
 }
 
-extension Resolver.Name {
+public extension Resolver.Name {
     
     static let maxPinAttempt = Resolver.Name("\(#file)-\(#function)")
     
