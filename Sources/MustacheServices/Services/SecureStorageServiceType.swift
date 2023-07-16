@@ -68,13 +68,11 @@ public class SecureStorageService: SecureStorageServiceType {
     }
     
     public var dataStoredWithPin: Bool {
-        let context = LAContext()
-        context.interactionNotAllowed = true
         let query: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: self.secAttrService,
             kSecAttrAccount: "\(UIDStorageMode.pin.rawValue)",
-            kSecUseAuthenticationContext: context
+            kSecUseAuthenticationUI: kSecUseAuthenticationUIFail
         ]
         
         let status = SecItemCopyMatching(query as CFDictionary, nil)
@@ -82,13 +80,11 @@ public class SecureStorageService: SecureStorageServiceType {
     }
     
     public var dataStoredWithBiometry: Bool {
-        let context = LAContext()
-        context.interactionNotAllowed = true
         let query: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: self.secAttrService,
             kSecAttrAccount: "\(UIDStorageMode.biometric.rawValue)",
-            kSecUseAuthenticationContext: context
+            kSecUseAuthenticationUI: kSecUseAuthenticationUIFail
         ]
         
         let status = SecItemCopyMatching(query as CFDictionary, nil)
@@ -187,6 +183,7 @@ public class SecureStorageService: SecureStorageServiceType {
         
         var searchQuery = self.queryFor(mode: .pin, context: self.context(pin: pin))
         searchQuery[kSecReturnData] = kCFBooleanTrue as Any
+        searchQuery[kSecUseAuthenticationUI] = kSecUseAuthenticationUIFail as Any
         
         var searchResult: AnyObject?
         let status = SecItemCopyMatching(searchQuery as CFDictionary, &searchResult)
@@ -216,7 +213,6 @@ public class SecureStorageService: SecureStorageServiceType {
     public func getData() async throws -> Data {
         
         let context = LAContext()
-        context.interactionNotAllowed = true
         // https://stackoverflow.com/questions/28108232/secitemcopymatching-for-touch-id-without-passcode-fallback
         // Not allowed
         // context.localizedFallbackTitle = Strings.Localizable.shoppingLocalAuthenticationFallBackMessage
@@ -226,7 +222,7 @@ public class SecureStorageService: SecureStorageServiceType {
             var query = self.queryFor(mode: .biometric, accessControl: self.accessControl(flags: [.biometryAny]), context: context)
             query[kSecReturnData] = kCFBooleanTrue as Any
             query[kSecMatchLimit] = kSecMatchLimitOne
-//            query[kSecUseAuthenticationUI] = kSecUseAuthenticationUISkip
+            query[kSecUseAuthenticationUI] = kSecUseAuthenticationUISkip
             
             var searchResult: AnyObject?
             let status = SecItemCopyMatching(query as CFDictionary, &searchResult)
@@ -270,7 +266,6 @@ public class SecureStorageService: SecureStorageServiceType {
     private func context(pin: String) -> LAContext {
         let context = LAContext()
         context.localizedReason = self.localizedReason
-        context.interactionNotAllowed = true
         context.setCredential(pin.data(using: .utf8), type: LACredentialType.applicationPassword)
         return context
     }
@@ -297,7 +292,6 @@ public class SecureStorageService: SecureStorageServiceType {
     
     deinit {
         debugPrint("deinit: \(self)")
-        NotificationCenter.default.removeObserver(self)
     }
     
 }
