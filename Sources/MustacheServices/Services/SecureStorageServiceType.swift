@@ -4,7 +4,7 @@ import MustacheFoundation
 import Resolver
 import LocalAuthentication
 
-protocol SecureStorageServiceType {
+public protocol SecureStorageServiceType {
     
     var passcodeSet: Bool { get }
     
