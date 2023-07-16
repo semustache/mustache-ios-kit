@@ -226,7 +226,7 @@ public class SecureStorageService: SecureStorageServiceType {
             var query = self.queryFor(mode: .biometric, accessControl: self.accessControl(flags: [.biometryAny]), context: context)
             query[kSecReturnData] = kCFBooleanTrue as Any
             query[kSecMatchLimit] = kSecMatchLimitOne
-            query[kSecUseAuthenticationUI] = kSecUseAuthenticationUISkip
+//            query[kSecUseAuthenticationUI] = kSecUseAuthenticationUISkip
             
             var searchResult: AnyObject?
             let status = SecItemCopyMatching(query as CFDictionary, &searchResult)
