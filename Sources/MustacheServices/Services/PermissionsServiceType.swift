@@ -5,10 +5,13 @@ import CoreBluetooth
 import AVFoundation
 import UserNotifications
 import MustacheFoundation
+import Combine
 
 public protocol PermissionsServiceType {
     
     var isLocationAllowed: Bool { get }
+    
+    var locationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> { get }
     
     var isNotificationAllowed: Bool { get }
     
@@ -27,14 +30,27 @@ public protocol PermissionsServiceType {
 
 public class PermissionsService: NSObject, PermissionsServiceType {
     
-    public var isLocationAllowed: Bool {
-        var authorizationStatus: CLAuthorizationStatus!
+    private var locationAuthorizationStatus: CLAuthorizationStatus {
         if #available(iOS 14.0, *) {
-            authorizationStatus = self.locationManager.authorizationStatus
+            return self.locationManager.authorizationStatus
         } else {
-            authorizationStatus = CLLocationManager.authorizationStatus()
+            return CLLocationManager.authorizationStatus()
         }
+    }
+    
+    public var isLocationAllowed: Bool {
+        var authorizationStatus = self.locationAuthorizationStatus
         return (authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways) && CLLocationManager.locationServicesEnabled()
+    }
+    
+    private lazy var locationStatusSubject: CurrentValueSubject<CLAuthorizationStatus, Never> = {
+        let initial = self.locationManager.authorizationStatus
+        let subject = CurrentValueSubject<CLAuthorizationStatus, Never>(initial)
+        return subject
+    }()
+    
+    public var locationStatusPublisher: AnyPublisher<CLAuthorizationStatus, Never> {
+        return self.locationStatusSubject.eraseToAnyPublisher()
     }
     
     @UserDefault("isNotificationAllowed", defaultValue: false)
@@ -122,6 +138,7 @@ extension PermissionsService: CLLocationManagerDelegate {
                 self.locationContinuation?.resume(returning: false)
         }
         self.locationContinuation = nil
+        self.locationStatusSubject.value = manager.authorizationStatus
     }
     
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
