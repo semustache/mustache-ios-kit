@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-extension Publisher {
+public extension Publisher {
     
     /// Includes the current element as well as the previous element from the upstream publisher in a tuple where the previous element is optional.
     /// The first time the upstream publisher emits an element, the previous element will be `nil`.
