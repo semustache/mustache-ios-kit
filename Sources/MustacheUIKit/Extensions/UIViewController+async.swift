@@ -2,7 +2,7 @@
 import Foundation
 import UIKit
 
-extension UIViewController {
+public extension UIViewController {
     
     func dismiss(animated: Bool) async {
         await withCheckedContinuation { [weak self] continuation in
