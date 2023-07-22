@@ -2,7 +2,7 @@
 import Foundation
 import Combine
 
-extension Future where Failure == Error {
+public extension Future where Failure == Error {
     
     convenience init(asyncFunc: @escaping () async throws -> Output) {
         self.init { promise in
