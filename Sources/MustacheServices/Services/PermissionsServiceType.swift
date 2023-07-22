@@ -182,3 +182,15 @@ extension PermissionsService: CBPeripheralManagerDelegate {
         self.peripheralContinuation = nil
     }
 }
+
+public extension CLAuthorizationStatus {
+    
+    var authorized: Bool {
+        switch self {
+            case .authorizedAlways, .authorizedWhenInUse:
+                return true
+            default:
+                return false
+        }
+    }
+}
