@@ -37,7 +37,9 @@ public enum Configuration: String {
 }
 
 public func infoForKey(_ key: String) -> String? {
-    return (Bundle.main.infoDictionary?[key] as? String)?.replacingOccurrences(of: "\\", with: "")
+    return (Bundle.main.infoDictionary?[key] as? String)?
+        .replacingOccurrences(of: "\\", with: "")
+        .trimmingCharacters(in: .whitespacesAndNewlines)
 }
 
 public func pListValue<T>(_ key: String, name: String) -> T? {
