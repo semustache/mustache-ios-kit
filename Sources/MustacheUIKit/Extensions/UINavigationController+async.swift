@@ -4,7 +4,7 @@ import UIKit
 
 public extension UINavigationController {
     
-    func pushViewController(viewController: UIViewController, animated: Bool) async  {
+    func pushViewControllerAsync(viewController: UIViewController, animated: Bool) async  {
         
         await withCheckedContinuation { [weak self] continuation in
             guard let self else {
@@ -20,7 +20,7 @@ public extension UINavigationController {
         }
     }
     
-    func popViewController(animated: Bool) async {
+    func popViewControllerAsync(animated: Bool) async {
         
         await withCheckedContinuation { [weak self] continuation in
             guard let self else {
@@ -35,7 +35,7 @@ public extension UINavigationController {
         }
     }
     
-    func popToRootViewController(animated: Bool) async  {
+    func popToRootViewControllerAsync(animated: Bool) async  {
         
         await withCheckedContinuation { [weak self] continuation in
             guard let self else {

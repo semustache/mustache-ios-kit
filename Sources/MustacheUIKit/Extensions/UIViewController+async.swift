@@ -4,7 +4,7 @@ import UIKit
 
 public extension UIViewController {
     
-    func dismiss(animated: Bool) async {
+    func dismissAsync(animated: Bool) async {
         await withCheckedContinuation { [weak self] continuation in
             guard let self else {
                 continuation.resume()
