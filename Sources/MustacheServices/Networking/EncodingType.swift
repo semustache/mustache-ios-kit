@@ -8,6 +8,7 @@ public enum EncodingType {
     case urlEncoded
     case multipartFormData
     case data
+    case text
     
     var contentType: String {
         switch self {
@@ -16,6 +17,7 @@ public enum EncodingType {
             case .urlEncoded: return "application/x-www-form-urlencoded"
             case .multipartFormData: return "multipart/form-data"
             case .data: return "application/data"
+            case .text: return "text/plain"
         }
     }
 }

@@ -151,6 +151,12 @@ public extension Endpoint {
                 guard let body = self.body as? Data else { fatalError("Unable to cast body as Data") }
                 request.httpBody = body
                 request.addValue(self.encoding.contentType, forHTTPHeaderField: "Content-Type")
+            
+            case .text:
+                
+                guard let body = self.body as? String else { fatalError("Unable to cast body as String") }
+                request.httpBody = body.data(using: .utf8, allowLossyConversion: false)
+                request.addValue(self.encoding.contentType, forHTTPHeaderField: "Content-Type")
         }
         
         return request
