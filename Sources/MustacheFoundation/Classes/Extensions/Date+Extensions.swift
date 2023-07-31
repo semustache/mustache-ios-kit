@@ -19,6 +19,14 @@ public extension Date {
         return weekday
     }
     
+    static var nowSafe: Date {
+        if #available(iOS 15, *) {
+            return self.now
+        } else {
+            return Date()
+        }
+    }
+    
     var dayNumberOfMonth: Int {
         return Calendar.daDK.dateComponents([.day], from: self).day ?? 0
     }
@@ -40,9 +48,9 @@ public extension Date {
         return endOfMonth ?? self
     }
     
-    var isInPast: Bool { return .now > self }
+    var isInPast: Bool { return .nowSafe > self }
     
-    var isInFuture: Bool { return .now < self }
+    var isInFuture: Bool { return .nowSafe < self }
     
     func format(_ format: String, utc: Bool = true) -> String {
         let dateFormatter = DateFormatter()

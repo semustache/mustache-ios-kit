@@ -1,9 +1,3 @@
-//
-//  RenewTokenServiceType.swift
-//
-//  Created by Daniel Tartaglia on 16 Jan 2019.
-//  Copyright © 2019 Daniel Tartaglia. MIT License.
-//
 
 import Foundation
 import MustacheServices

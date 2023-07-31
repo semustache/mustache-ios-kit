@@ -12,7 +12,7 @@ extension Observable {
     public static func refresher() -> Observable<Void> {
         return Observable<Int>.timer(.seconds(0), period: .seconds(60), scheduler: MainScheduler.instance)
             .filter({ state in
-                let minute = Calendar.daDK.component(.minute, from: .now)
+                let minute = Calendar.daDK.component(.minute, from: .nowSafe)
                 let remainder = minute % 5
                 return remainder == 0 || state == 0
             })

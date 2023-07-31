@@ -1,9 +1,3 @@
-//
-//  Throwable.swift
-//  MustacheFoundation
-//
-//  Created by Tommy Hinrichsen on 07/10/2019.
-//
 
 import Foundation
 

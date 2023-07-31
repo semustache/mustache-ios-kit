@@ -1,10 +1,3 @@
-//
-//  ExpandingTableView.swift
-//  loyaltyapp
-//
-//  Created by Simon Elhøj Steinmejer on 06/08/2020.
-//  Copyright © 2020 Dagrofa. All rights reserved.
-//
 
 import UIKit
 
@@ -28,7 +21,9 @@ open class ExpandingTableView: UITableView {
 	}
 
 	fileprivate func configure() {
-        self.sectionHeaderTopPadding = 0.0
+        if #available(iOS 15.0, *) {
+            self.sectionHeaderTopPadding = 0.0
+        }
 	}
 
 	override open func reloadData() {

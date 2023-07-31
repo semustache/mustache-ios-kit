@@ -1,10 +1,3 @@
-//
-//  UserDefault.swift
-//  userapp
-//
-//  Created by Tommy Sadiq Hinrichsen on 05/04/2020.
-//  Copyright © 2020 Tommy Sadiq Hinrichsen. All rights reserved.
-//
 
 import Foundation
 

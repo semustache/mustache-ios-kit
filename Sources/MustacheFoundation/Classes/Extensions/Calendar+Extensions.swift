@@ -24,7 +24,7 @@ public extension Calendar {
     }
     
     func within(_ date: Date, within component: Calendar.Component, value: UInt) -> Bool {
-        let start = Date.now
+        let start = Date.nowSafe
         guard let end = self.date(byAdding: component, value: value.int, to: start) else { return false }
         return start...end ~= date
     }

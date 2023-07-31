@@ -1,6 +1,3 @@
-//
-// Created by Tommy Hinrichsen on 2019-04-17.
-//
 
 import Foundation
 import UIKit

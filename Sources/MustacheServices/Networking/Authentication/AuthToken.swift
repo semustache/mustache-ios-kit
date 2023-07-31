@@ -27,11 +27,11 @@ public extension AuthToken {
     }
     
     var accessTokenExpired: Bool {
-        return (self.accessTokenExpiration ?? .distantFuture) < .now
+        return (self.accessTokenExpiration ?? .distantFuture) < .nowSafe
     }
     
     var refreshTokenExpired: Bool {
-        return (self.refreshTokenExpiration ?? .distantFuture) < .now        
+        return (self.refreshTokenExpiration ?? .distantFuture) < .nowSafe
     }
     
 }

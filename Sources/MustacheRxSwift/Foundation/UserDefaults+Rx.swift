@@ -1,6 +1,3 @@
-//
-// Created by Tommy Hinrichsen on 2019-05-06.
-//
 
 import Foundation
 import RxSwift
