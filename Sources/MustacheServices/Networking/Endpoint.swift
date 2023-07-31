@@ -23,6 +23,8 @@ public protocol Endpoint {
 
     var cachePolicy: URLRequest.CachePolicy { get }
     
+    var requestModifer: ((inout URLRequest) -> ())? { get }
+    
 }
 
 public extension Endpoint {
@@ -42,6 +44,8 @@ public extension Endpoint {
     var encoding: EncodingType { return .none }
 
     var cachePolicy: URLRequest.CachePolicy { return .useProtocolCachePolicy }
+    
+    var requestModifer: ((inout URLRequest) -> ())? { return nil }
     
 }
 
@@ -157,6 +161,10 @@ public extension Endpoint {
                 guard let body = self.body as? String else { fatalError("Unable to cast body as String") }
                 request.httpBody = body.data(using: .utf8, allowLossyConversion: false)
                 request.addValue(self.encoding.contentType, forHTTPHeaderField: "Content-Type")
+        }
+        
+        if let modifier = self.requestModifer {
+            modifier(&request)
         }
         
         return request
