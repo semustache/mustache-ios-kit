@@ -4,6 +4,8 @@ import UIKit
 
 public final class SwipeNavigationController: UINavigationController {
 
+    private var isHidden: Bool = true
+    
     // MARK: - Lifecycle
 
     var _preferredInterfaceOrientationForPresentation: UIInterfaceOrientation = .portrait
@@ -18,10 +20,11 @@ public final class SwipeNavigationController: UINavigationController {
         }
     }
     
-    convenience public init(forwardingDelegate: UINavigationControllerDelegate?) {
+    convenience public init(forwardingDelegate: UINavigationControllerDelegate?, isHidden: Bool = true) {
         self.init(nibName: nil, bundle: nil)
         super.delegate = self
         self.forwardingDelegate = forwardingDelegate
+        self.isHidden = false
     }
 
     convenience public init() {
@@ -51,7 +54,7 @@ public final class SwipeNavigationController: UINavigationController {
     
     func configure() {
         self.interactivePopGestureRecognizer?.delegate = self
-        self.setNavigationBarHidden(true, animated: false)
+        self.setNavigationBarHidden(self.isHidden, animated: false)
     }
 
     deinit {
