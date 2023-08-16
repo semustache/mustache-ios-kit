@@ -24,7 +24,7 @@ public final class SwipeNavigationController: UINavigationController {
         self.init(nibName: nil, bundle: nil)
         super.delegate = self
         self.forwardingDelegate = forwardingDelegate
-        self.isHidden = false
+        self.isHidden = isHidden
     }
 
     convenience public init() {
