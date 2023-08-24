@@ -2,7 +2,7 @@
 import Foundation
 import UIKit
 
-extension UIControl {
+public extension UIControl {
     
     func add(event: UIControl.Event, action: @escaping (()->())) {
         let identifier = UIAction.Identifier("UIControl.Event.\(event)")
