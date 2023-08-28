@@ -5,9 +5,9 @@ import RxCocoa
 @propertyWrapper
 open class RxUserDefault<Value: Codable> {
     
-    var key: String
+    private var key: String
     
-    fileprivate var defaultValue: Value
+    private var defaultValue: Value
     
     public init(_ key: String, defaultValue: Value) {
         self.key = key
@@ -27,7 +27,7 @@ open class RxUserDefault<Value: Codable> {
 @propertyWrapper
 open class RxUserDefaultOptional<Value: Codable> {
     
-    fileprivate var key: String
+    private var key: String
     
     public init(_ key: String) {
         self.key = key

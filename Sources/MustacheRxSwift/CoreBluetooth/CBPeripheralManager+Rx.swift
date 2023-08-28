@@ -5,7 +5,7 @@ import RxSwift
 import RxCocoa
 
 // swiftlint:disable identifier_name
-extension Reactive where Base: CBPeripheralManager {
+public extension Reactive where Base: CBPeripheralManager {
     
     var delegate: CBPeripheralManagerDelegateProxy {
         return CBPeripheralManagerDelegateProxy.proxy(for: base)
