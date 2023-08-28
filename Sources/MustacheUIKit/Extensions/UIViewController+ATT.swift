@@ -4,7 +4,7 @@ import UIKit
 #if canImport(AppTrackingTransparency)
 import AppTrackingTransparency
 
-extension UIViewController {
+public extension UIViewController {
     
     func requestTrackingAuthorization(_ completion: @escaping () -> Void) -> Bool {
         guard ATTrackingManager.trackingAuthorizationStatus.rawValue != ATTrackingManager.AuthorizationStatus.notDetermined.rawValue else {
