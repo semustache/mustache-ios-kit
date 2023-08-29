@@ -2,32 +2,35 @@
 import Foundation
 import UIKit
 
+@IBDesignable
 class SeperatorView: UIView {
     
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.configure()
+    @IBInspectable
+    var separatorColor: UIColor = UIColor.separator {
+        didSet {
+            self.backgroundColor = self.separatorColor
+        }
     }
     
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        self.configure()
+    @IBInspectable
+    var isHorizontal: Bool = true {
+        didSet {
+            self.invalidateIntrinsicContentSize()
+        }
     }
     
     override var intrinsicContentSize: CGSize {
         var intrinsicContentSize = super.intrinsicContentSize
+        
         let lineHeight = 1.0 / UIScreen.main.scale
-        intrinsicContentSize.height = lineHeight
+        
+        if self.isHorizontal {
+            intrinsicContentSize.height = lineHeight
+        } else {
+            intrinsicContentSize.width = lineHeight
+        }
+        
         return intrinsicContentSize
-    }
-    
-    func configure() {
-        self.backgroundColor = UIColor.separator
-    }
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        self.configure()
     }
     
 }
