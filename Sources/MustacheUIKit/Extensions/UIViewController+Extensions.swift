@@ -30,6 +30,7 @@ public extension UIViewController {
         - cancelButtonTitle: String
 
     */
+    @available(*, deprecated, message: "Use UIAlertController.alert or UIAlertController.sheet instead")
     func alert(title: String?,
                message: String?,
                okAction: (@escaping () -> Void) = {},

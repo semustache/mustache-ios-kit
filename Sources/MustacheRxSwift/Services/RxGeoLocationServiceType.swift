@@ -50,7 +50,7 @@ public class RxGeoLocationService: RxGeoLocationServiceType {
         self.locationManager.distanceFilter = kCLDistanceFilterNone
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
 
-        self.authorized = self.locationManager.rx.didChangeAuthorizationStatus.startWith(CLLocationManager.authorizationStatus()).map( { [weak self] (status: CLAuthorizationStatus) -> Bool in
+        self.authorized = self.locationManager.rx.didChangeAuthorizationStatus.startWith(self.locationManager.authorizationStatus).map( { [weak self] (status: CLAuthorizationStatus) -> Bool in
             switch status {
                 case .authorizedWhenInUse, .authorizedAlways:
                     guard let self = self else { return true }
@@ -61,7 +61,7 @@ public class RxGeoLocationService: RxGeoLocationServiceType {
             }
         })
 
-        self.status = self.locationManager.rx.didChangeAuthorizationStatus.startWith(CLLocationManager.authorizationStatus())
+        self.status = self.locationManager.rx.didChangeAuthorizationStatus.startWith(self.locationManager.authorizationStatus)
 
     }
 }

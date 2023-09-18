@@ -153,7 +153,7 @@ public extension Reactive where Base: CLLocationManager {
     */
     var didRangeBeaconsInRegion: Observable<(beacons: [CLBeacon], region: CLBeaconRegion)> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
-                        .locationManager(_:didRangeBeacons:in:)))
+                        .locationManager(_:didRange:satisfying:)))
                 .map { a in
                     let beacons = try castOrThrow([CLBeacon].self, a[1])
                     let region = try castOrThrow(CLBeaconRegion.self, a[2])
@@ -166,7 +166,7 @@ public extension Reactive where Base: CLLocationManager {
     */
     var rangingBeaconsDidFailForRegionWithError: Observable<(region: CLBeaconRegion, error: NSError)> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
-                        .locationManager(_:rangingBeaconsDidFailFor:withError:)))
+                        .locationManager(_:didFailRangingFor:error:)))
                 .map { a in
                     let region = try castOrThrow(CLBeaconRegion.self, a[1])
                     let error = try castOrThrow(NSError.self, a[2])
@@ -194,7 +194,7 @@ public extension Reactive where Base: CLLocationManager {
     */
     var didChangeAuthorizationStatus: Observable<CLAuthorizationStatus> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
-                        .locationManager(_:didChangeAuthorization:)))
+                .locationManagerDidChangeAuthorization(_:)))
                 .map { a in
                     let number = try castOrThrow(NSNumber.self, a[1])
                     return CLAuthorizationStatus(rawValue: Int32(number.intValue)) ?? .notDetermined

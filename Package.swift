@@ -28,7 +28,7 @@ let package = Package(
         .package(url: "https://github.com/onevcat/Kingfisher.git", exact: "7.7.0"),
         .package(url: "https://github.com/SnapKit/SnapKit.git", exact: "5.6.0"),
         .package(url: "https://github.com/ReactiveX/RxSwift.git", exact: "6.6.0"),
-        .package(url: "https://github.com/RxSwiftCommunity/RxSwiftExt.git", exact: "6.1.0"),
+        .package(url: "https://github.com/RxSwiftCommunity/RxSwiftExt.git", exact: "6.2.0"),
         .package(url: "https://github.com/mustachedk/RxViewController.git", exact: "2.0.1"),
     ],
     targets: [

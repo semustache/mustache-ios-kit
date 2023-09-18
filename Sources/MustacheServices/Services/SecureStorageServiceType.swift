@@ -68,11 +68,13 @@ public class SecureStorageService: SecureStorageServiceType {
     }
     
     public var dataStoredWithPin: Bool {
+        let context = LAContext()
+        context.interactionNotAllowed = true
         let query: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: self.secAttrService,
             kSecAttrAccount: "\(UIDStorageMode.pin.rawValue)",
-            kSecUseAuthenticationUI: kSecUseAuthenticationUIFail
+            kSecUseAuthenticationContext: context
         ]
         
         let status = SecItemCopyMatching(query as CFDictionary, nil)
@@ -80,11 +82,13 @@ public class SecureStorageService: SecureStorageServiceType {
     }
     
     public var dataStoredWithBiometry: Bool {
+        let context = LAContext()
+        context.interactionNotAllowed = true
         let query: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: self.secAttrService,
             kSecAttrAccount: "\(UIDStorageMode.biometric.rawValue)",
-            kSecUseAuthenticationUI: kSecUseAuthenticationUIFail
+            kSecUseAuthenticationContext: context
         ]
         
         let status = SecItemCopyMatching(query as CFDictionary, nil)
@@ -93,10 +97,13 @@ public class SecureStorageService: SecureStorageServiceType {
     
     private var pinAttempts: Int {
         get {
-            return KeychainWrapper.standard.integer(forKey: "pinAttempts", withAccessibility: .afterFirstUnlockThisDeviceOnly) ?? 0
+            guard let data = KeychainWrapper.standard.data(forKey: "pinAttempts", withAccessibility: .afterFirstUnlockThisDeviceOnly) else { return 0 }
+            let attempts = data.withUnsafeBytes( { $0.load(as: Int.self) })
+            return attempts
         }
         set {
-            KeychainWrapper.standard.set(newValue, forKey: "pinAttempts", withAccessibility: .afterFirstUnlockThisDeviceOnly)
+            let data = withUnsafeBytes(of: newValue) { Data($0) }
+            KeychainWrapper.standard.set(data, forKey: "pinAttempts", withAccessibility: .afterFirstUnlockThisDeviceOnly)
         }
     }
     
@@ -180,10 +187,11 @@ public class SecureStorageService: SecureStorageServiceType {
     }
     
     public func getData(with pin: String) throws -> Data  {
+        let context = self.context(pin: pin)
+        context.interactionNotAllowed = true
         
-        var searchQuery = self.queryFor(mode: .pin, context: self.context(pin: pin))
+        var searchQuery = self.queryFor(mode: .pin, context: context)
         searchQuery[kSecReturnData] = kCFBooleanTrue as Any
-        searchQuery[kSecUseAuthenticationUI] = kSecUseAuthenticationUIFail as Any
         
         var searchResult: AnyObject?
         let status = SecItemCopyMatching(searchQuery as CFDictionary, &searchResult)

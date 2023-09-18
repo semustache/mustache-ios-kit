@@ -39,7 +39,7 @@ public class PermissionsService: NSObject, PermissionsServiceType {
     }
     
     public var isLocationAllowed: Bool {
-        var authorizationStatus = self.locationAuthorizationStatus
+        let authorizationStatus = self.locationAuthorizationStatus
         return (authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways) && CLLocationManager.locationServicesEnabled()
     }
     

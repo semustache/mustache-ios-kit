@@ -8,7 +8,9 @@ public protocol CoordinatorDelegate: CoordinatorType {
 }
 
 public extension CoordinatorDelegate {
+    
     func completed(child: CoordinatorType?) {
         self.childCoordinators.removeAll(where: { $0 === child })
     }
+    
 }
