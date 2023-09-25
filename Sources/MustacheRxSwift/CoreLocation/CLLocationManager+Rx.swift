@@ -196,8 +196,9 @@ public extension Reactive where Base: CLLocationManager {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                 .locationManagerDidChangeAuthorization(_:)))
                 .map { a in
-                    let number = try castOrThrow(NSNumber.self, a[1])
-                    return CLAuthorizationStatus(rawValue: Int32(number.intValue)) ?? .notDetermined
+                    let manager = try castOrThrow(CLLocationManager.self, a[0])
+                    let status = manager.authorizationStatus
+                    return status
                 }
     }
 
