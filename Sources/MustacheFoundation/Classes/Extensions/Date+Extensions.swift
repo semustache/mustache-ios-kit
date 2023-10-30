@@ -19,6 +19,15 @@ public extension Date {
         return weekday
     }
     
+    var weekday2: Int {
+        let weekday = Calendar.daDK.component(.weekday, from: self)
+        if weekday == 1 {
+            return 7
+        } else {
+            return weekday - 1
+        }
+    }
+    
     static var nowSafe: Date {
         if #available(iOS 15, *) {
             return self.now
