@@ -48,7 +48,7 @@ public extension UIViewController {
         // UIAlertAction can be created without title but it will crash on iPhone
         
         if let destructiveAction = destructiveAction, let destructiveButtonTitle = destructiveButtonTitle {
-            let destructiveAction = UIAlertAction(title: cancelButtonTitle, style: .destructive, handler: { [destructiveAction] _ in destructiveAction() })
+            let destructiveAction = UIAlertAction(title: destructiveButtonTitle, style: .destructive, handler: { [destructiveAction] _ in destructiveAction() })
             alertController.addAction(destructiveAction)
         }
         
