@@ -45,12 +45,14 @@ public extension UIViewController {
         let OKAction = UIAlertAction(title: okButtonTitle, style: .default, handler: { [okAction] _ in okAction() })
         alertController.addAction(OKAction)
         
-        if let destructiveAction = destructiveAction {
-            let destructiveAction = UIAlertAction(title: cancelButtonTitle, style: .destructive, handler: { [destructiveAction] _ in destructiveAction() })
+        // UIAlertAction can be created without title but it will crash on iPhone
+        
+        if let destructiveAction = destructiveAction, let destructiveButtonTitle = destructiveButtonTitle {
+            let destructiveAction = UIAlertAction(title: destructiveButtonTitle, style: .destructive, handler: { [destructiveAction] _ in destructiveAction() })
             alertController.addAction(destructiveAction)
         }
         
-        if let cancelAction = cancelAction {
+        if let cancelAction = cancelAction, let cancelButtonTitle = cancelButtonTitle {
             let cancelAction = UIAlertAction(title: cancelButtonTitle, style: .cancel, handler: { [cancelAction] _ in cancelAction() })
             alertController.addAction(cancelAction)
         }
