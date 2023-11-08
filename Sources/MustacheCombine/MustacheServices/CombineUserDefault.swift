@@ -5,6 +5,7 @@ import Combine
 // Credit
 // https://gist.github.com/simonbs/61c8269e1b0550feab606ee9890fa72b
 
+@available(iOS 13.0, *)
 @propertyWrapper
 public class UserDefaultC<T: Codable>: NSObject {
     
@@ -50,6 +51,7 @@ public class UserDefaultC<T: Codable>: NSObject {
     
 }
 
+@available(iOS 13.0, *)
 @propertyWrapper
 public  class UserDefaultCOptional<T: Codable>: NSObject {
     

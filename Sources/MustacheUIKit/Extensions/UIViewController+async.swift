@@ -2,6 +2,7 @@
 import Foundation
 import UIKit
 
+@available(iOS 13.0.0, *)
 public extension UIViewController {
     
     func dismissAsync(animated: Bool) async {

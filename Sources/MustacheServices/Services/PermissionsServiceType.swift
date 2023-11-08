@@ -7,6 +7,7 @@ import UserNotifications
 import MustacheFoundation
 import Combine
 
+@available(iOS 14.0, *)
 public protocol PermissionsServiceType {
     
     var isLocationAllowed: Bool { get }
@@ -28,14 +29,11 @@ public protocol PermissionsServiceType {
     func bluetoothPermission() async throws -> Bool
 }
 
+@available(iOS 14.0, *)
 public class PermissionsService: NSObject, PermissionsServiceType {
     
     private var locationAuthorizationStatus: CLAuthorizationStatus {
-        if #available(iOS 14.0, *) {
-            return self.locationManager.authorizationStatus
-        } else {
-            return CLLocationManager.authorizationStatus()
-        }
+        return self.locationManager.authorizationStatus
     }
     
     public var isLocationAllowed: Bool {
@@ -121,6 +119,7 @@ public class PermissionsService: NSObject, PermissionsServiceType {
     }
 }
 
+@available(iOS 14.0, *)
 extension PermissionsService: CLLocationManagerDelegate {
     
     @objc public func locationManagerTimeout() {
@@ -162,6 +161,7 @@ extension PermissionsService: CLLocationManagerDelegate {
     
 }
 
+@available(iOS 14.0, *)
 extension PermissionsService: CBPeripheralManagerDelegate {
     
     @objc public func peripheralManagerTimeout() {

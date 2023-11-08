@@ -2,6 +2,7 @@
 import Foundation
 import UIKit
 
+@available(iOS 14.0, *)
 public extension UIControl {
     
     func add(event: UIControl.Event, action: @escaping (()->())) {

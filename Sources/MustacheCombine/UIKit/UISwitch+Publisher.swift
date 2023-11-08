@@ -3,6 +3,7 @@ import Foundation
 import UIKit
 import Combine
 
+@available(iOS 13.0, *)
 public extension UISwitch {
     
     func isOnPublisher() -> AnyPublisher<Bool, Never> {

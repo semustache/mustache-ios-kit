@@ -74,13 +74,14 @@ public extension Date {
     
 }
 
-extension Date: Strideable {
-
-    public func advanced(by n: Int) -> Date {
-         return Calendar.current.date(byAdding: .day, value: n, to: self) ?? self
-     }
- 
-     public func distance(to other: Date) -> Int {
-         return Calendar.current.dateComponents([.day], from: other, to: self).day ?? 0
-     }
- }
+//@available(iOS 13.0, *)
+//extension Date: Strideable {
+//
+//    public func advanced(by n: Int) -> Date {
+//         return Calendar.current.date(byAdding: .day, value: n, to: self) ?? self
+//     }
+// 
+//     public func distance(to other: Date) -> Int {
+//         return Calendar.current.dateComponents([.day], from: other, to: self).day ?? 0
+//     }
+// }

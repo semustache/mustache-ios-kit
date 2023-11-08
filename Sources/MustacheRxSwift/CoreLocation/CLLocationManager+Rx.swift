@@ -151,6 +151,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
+    @available(iOS 13.0, *)
     var didRangeBeaconsInRegion: Observable<(beacons: [CLBeacon], region: CLBeaconRegion)> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManager(_:didRange:satisfying:)))
@@ -164,6 +165,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
+    @available(iOS 13.0, *)
     var rangingBeaconsDidFailForRegionWithError: Observable<(region: CLBeaconRegion, error: NSError)> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManager(_:didFailRangingFor:error:)))
@@ -192,6 +194,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
+    @available(iOS 14.0, *)
     var didChangeAuthorizationStatus: Observable<CLAuthorizationStatus> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                 .locationManagerDidChangeAuthorization(_:)))

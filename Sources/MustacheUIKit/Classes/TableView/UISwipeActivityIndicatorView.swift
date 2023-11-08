@@ -8,7 +8,11 @@ open class UISwipeActivityIndicatorView: UIActivityIndicatorView {
 	var buttonLabel: UIView!
 
 	init(buttonLabel: UIView){
-        super.init(style: UIActivityIndicatorView.Style.medium)
+        if #available(iOS 13.0, *) {
+            super.init(style: UIActivityIndicatorView.Style.medium)
+        } else {
+            super.init(style: UIActivityIndicatorView.Style.white)
+        }
 		self.buttonLabel = buttonLabel
 	}
 

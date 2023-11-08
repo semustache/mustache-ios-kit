@@ -2,6 +2,7 @@
 import Foundation
 import Combine
 
+@available(iOS 13.0, *)
 public extension Future where Failure == Error {
     
     convenience init(asyncFunc: @escaping () async throws -> Output) {

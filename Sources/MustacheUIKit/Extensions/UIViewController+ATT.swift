@@ -4,6 +4,7 @@ import UIKit
 #if canImport(AppTrackingTransparency)
 import AppTrackingTransparency
 
+@available(iOS 14, *)
 public extension UIViewController {
     
     func requestTrackingAuthorization(_ completion: @escaping () -> Void) -> Bool {

@@ -17,6 +17,7 @@ public protocol RxGeoLocationServiceType {
 
 }
 
+@available(iOS 14.0, *)
 public class RxGeoLocationService: RxGeoLocationServiceType {
 
     public var authorized: Observable<Bool>!

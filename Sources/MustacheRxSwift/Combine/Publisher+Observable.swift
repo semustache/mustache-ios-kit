@@ -9,6 +9,7 @@
 import Combine
 import RxSwift
 
+@available(iOS 13.0, *)
 public extension Publisher {
     /// Returns an Observable<Output> representing the underlying
     /// Publisher. Upon subscription, the Publisher's sink pushes
@@ -36,6 +37,7 @@ public extension Publisher {
     }
 }
 
+@available(iOS 13.0, *)
 public extension Publisher where Failure == Never {
     /// Returns an Observable<Output> representing the underlying
     /// Publisher. Upon subscription, the Publisher's sink pushes

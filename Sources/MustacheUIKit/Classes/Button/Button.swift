@@ -41,7 +41,13 @@ open class Button: UIButton {
 
     //----------------------------------- IsBusy -----------------------------------//
 
-    fileprivate var activityIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
+    fileprivate lazy var activityIndicator: UIActivityIndicatorView = {
+        if #available(iOS 13.0, *) {
+            return UIActivityIndicatorView(style: UIActivityIndicatorView.Style.medium)
+        } else {
+            return UIActivityIndicatorView(style: UIActivityIndicatorView.Style.white)
+        }
+    }()
 
     /// ActivityIndicatorStyle for the button when its busy
     public var activityIndicatorStyle: UIActivityIndicatorView.Style {

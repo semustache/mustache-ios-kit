@@ -1,8 +1,10 @@
 import Combine
 import UIKit
 
+@available(iOS 13.0, *)
 extension UIControl {
  
+    
     public struct EventControlPublisher<Control: UIControl>: Publisher {
         public typealias Output = Control
         public typealias Failure = Never
@@ -21,6 +23,7 @@ public protocol Combinable {}
 
 extension UIControl: Combinable {}
 
+@available(iOS 13.0, *)
 public extension Combinable where Self: UIControl {
     
     func publisher(for event: UIControl.Event) -> UIControl.EventControlPublisher<Self> {

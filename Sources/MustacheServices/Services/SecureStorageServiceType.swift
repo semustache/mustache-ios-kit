@@ -22,12 +22,15 @@ public protocol SecureStorageServiceType {
     
     func store(data: Data, with pin: String) throws
     
+    @available(iOS 13.0, *)
     func enableBiometrics() async throws
     
     func store(data: Data) throws
     
+    @available(iOS 13.0, *)
     func getData(with pin: String) async throws -> Data
     
+    @available(iOS 13.0, *)
     func getData() async throws -> Data
     
     func clearData(from: UIDStorageMode)
@@ -154,7 +157,7 @@ public class SecureStorageService: SecureStorageServiceType {
         }
             
     }
-    
+    @available(iOS 13.0, *)
     public func enableBiometrics() async throws {
         
         let context = LAContext()
@@ -218,6 +221,7 @@ public class SecureStorageService: SecureStorageServiceType {
         
     }
     
+    @available(iOS 13.0, *)
     public func getData() async throws -> Data {
         
         let context = LAContext()
@@ -337,6 +341,7 @@ public class SimulatorSecureStorageService: SecureStorageService {
         return self.storage[.pin] ?? Data()
     }
     
+    @available(iOS 13.0, *)
     override public func getData() async throws -> Data {
         return self.storage[.biometric] ?? Data()
     }

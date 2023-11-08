@@ -15,6 +15,7 @@ public protocol AsyncNetworkServiceType {
     
 }
 
+@available(iOS 13.0, *)
 public extension AsyncNetworkServiceType {
     
     func send<T: Decodable>(endpoint: Endpoint) async throws -> T {

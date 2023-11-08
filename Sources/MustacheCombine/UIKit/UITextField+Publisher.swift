@@ -2,6 +2,7 @@ import Foundation
 import UIKit
 import Combine
 
+@available(iOS 13.0, *)
 public extension UITextField {
     
     func textPublisher() -> AnyPublisher<String, Never> {
