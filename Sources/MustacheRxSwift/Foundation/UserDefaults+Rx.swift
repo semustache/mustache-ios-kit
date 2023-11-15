@@ -5,7 +5,7 @@ import RxCocoa
 
 public extension UserDefaults {
 
-    func observeCodable<T: Codable>(_ type: T.Type, _ keyPath: String) -> Observable<T?> {
+    func observeCodable<T: Codable>(_ type: T.Type, _ keyPath: String) -> RxObservable<T?> {
 
         let string = "\(UserDefaults.didChangeNotification.rawValue)-\(keyPath)"
         let name = NSNotification.Name(rawValue: string)

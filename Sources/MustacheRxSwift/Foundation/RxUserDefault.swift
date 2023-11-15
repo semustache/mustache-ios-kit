@@ -19,7 +19,7 @@ open class RxUserDefault<Value: Codable> {
         set { UserDefaults.standard.encode(newValue, forKey: key) }
     }
     
-    open var projectedValue: Observable<Value> {
+    open var projectedValue: RxObservable<Value> {
         return UserDefaults.standard.observeCodable(Value.self, self.key).unwrap().startWith(self.wrappedValue)
     }
 }
@@ -38,7 +38,7 @@ open class RxUserDefaultOptional<Value: Codable> {
         set { UserDefaults.standard.encode(newValue, forKey: key) }
     }
     
-    open var projectedValue: Observable<Value?> {
+    open var projectedValue: RxObservable<Value?> {
         return UserDefaults.standard.observeCodable(Value.self, self.key).startWith(self.wrappedValue)
     }
 }

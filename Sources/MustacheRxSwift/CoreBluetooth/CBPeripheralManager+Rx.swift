@@ -11,17 +11,17 @@ public extension Reactive where Base: CBPeripheralManager {
         return CBPeripheralManagerDelegateProxy.proxy(for: base)
     }
     
-    var state: Observable<CBManagerState> { return self.delegate.didUpdateState }
+    var state: RxObservable<CBManagerState> { return self.delegate.didUpdateState }
     
-    var didUpdateState: Observable<Void> { return delegate.didUpdateState.map { _ in } }
+    var didUpdateState: RxObservable<Void> { return delegate.didUpdateState.map { _ in } }
     
     // optional methods are setup using the `methodInvoked` function on the delegate
-    var willRestoreState: Observable<[String: Any]> {
+    var willRestoreState: RxObservable<[String: Any]> {
         return delegate.methodInvoked(#selector(CBPeripheralManagerDelegate.peripheralManager(_:willRestoreState:)))
             .map { $0[1] as! [String: Any] }
     }
     
-    var didStartAdvertising: Observable<Error?> {
+    var didStartAdvertising: RxObservable<Error?> {
         return delegate.methodInvoked(#selector(CBPeripheralManagerDelegate.peripheralManagerDidStartAdvertising(_:error:)))
             .map { $0[1] as? Error }
     }

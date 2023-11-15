@@ -11,14 +11,14 @@ import RxSwift
 
 @available(iOS 13.0, *)
 public extension Publisher {
-    /// Returns an Observable<Output> representing the underlying
+    /// Returns an RxObservable<Output> representing the underlying
     /// Publisher. Upon subscription, the Publisher's sink pushes
     /// events into the Observable. Upon disposing of the subscription,
     /// the sink is cancelled.
     ///
-    /// - returns: Observable<Output>
-    func asObservable() -> Observable<Output> {
-        Observable<Output>.create { observer in
+    /// - returns: RxObservable<Output>
+    func asObservable() -> RxObservable<Output> {
+        RxObservable<Output>.create { observer in
             let cancellable = self.sink(
                 receiveCompletion: { completion in
                     switch completion {
@@ -39,12 +39,12 @@ public extension Publisher {
 
 @available(iOS 13.0, *)
 public extension Publisher where Failure == Never {
-    /// Returns an Observable<Output> representing the underlying
+    /// Returns an RxObservable<Output> representing the underlying
     /// Publisher. Upon subscription, the Publisher's sink pushes
     /// events into the Observable. Upon disposing of the subscription,
     /// the sink is cancelled.
     ///
-    /// - returns: Observable<Output>
+    /// - returns: RxObservable<Output>
     func asInfallible() -> Infallible<Output> {
         Infallible<Output>.create { observer in
             let cancellable = self.sink(

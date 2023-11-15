@@ -9,22 +9,22 @@ import RxCocoa
 
 public protocol RxGeoLocationServiceType {
 
-    var authorized: Observable<Bool>! { get }
+    var authorized: RxObservable<Bool>! { get }
 
-    var status: Observable<CLAuthorizationStatus>! { get }
+    var status: RxObservable<CLAuthorizationStatus>! { get }
 
-    var location: Observable<CLLocation> { get }
+    var location: RxObservable<CLLocation> { get }
 
 }
 
 @available(iOS 14.0, *)
 public class RxGeoLocationService: RxGeoLocationServiceType {
 
-    public var authorized: Observable<Bool>!
+    public var authorized: RxObservable<Bool>!
 
-    public var status: Observable<CLAuthorizationStatus>!
+    public var status: RxObservable<CLAuthorizationStatus>!
 
-    public lazy var location: Observable<CLLocation> = {
+    public lazy var location: RxObservable<CLLocation> = {
         return locationManager.rx.didUpdateLocations
                 .filter({ (locations: [CLLocation]) -> Bool in
                     return locations.count > 0

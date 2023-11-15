@@ -3,8 +3,8 @@ import Foundation
 
 public extension URLSession {
 
-    func dataTask(with request: URLRequest) -> Observable<(Data?, URLResponse?)> {
-        return Observable.create { (observer: AnyObserver<(Data?, URLResponse?)>) in
+    func dataTask(with request: URLRequest) -> RxObservable<(Data?, URLResponse?)> {
+        return RxObservable.create { (observer: AnyObserver<(Data?, URLResponse?)>) in
             let task = self.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) -> Void in
                 if let error = error {
                     observer.onError(error)

@@ -8,8 +8,8 @@ import RxCocoa
 
 public extension Reactive where Base: EKEventStore {
     
-    func requestAccess(to entityType: EKEntityType) -> Observable<Bool> {
-        return Observable.create { observer in
+    func requestAccess(to entityType: EKEntityType) -> RxObservable<Bool> {
+        return RxObservable.create { observer in
             self.base.requestAccess(to: entityType) { granted, error in
                 DispatchQueue.main.async {
                     if let error = error {

@@ -5,7 +5,7 @@ import RxCocoa
 
 public extension Reactive where Base: UIPickerView {
 
-    func selected<T>(_ modelType: T.Type) -> Observable<T> {
+    func selected<T>(_ modelType: T.Type) -> RxObservable<T> {
         return self.modelSelected(T.self)
                 .map { models -> T? in return models.first }
                 .unwrap()

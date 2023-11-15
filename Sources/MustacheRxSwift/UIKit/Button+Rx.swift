@@ -14,9 +14,9 @@ public extension Reactive where Base: Button {
 
 }
 
-public extension Observable {
+public extension RxObservable {
 
-    func busy(button: Button) -> Observable {
+    func busy(button: Button) -> RxObservable<Element> {
         return self.do(onSubscribe: { [weak button] in
             button?.isBusy = true
         }, onDispose: { [weak button] in

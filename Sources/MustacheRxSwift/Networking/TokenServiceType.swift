@@ -5,6 +5,6 @@ import RxSwift
 
 public protocol TokenServiceType {
 
-    func updateToken() -> Observable<Void>
+    func updateToken() -> RxObservable<Void>
 
 }

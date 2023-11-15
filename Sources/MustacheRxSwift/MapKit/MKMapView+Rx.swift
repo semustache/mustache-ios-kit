@@ -53,7 +53,7 @@ public extension Reactive where Base: MKMapView {
         return ControlEvent(events: source)
     }
 
-    var didFailLoadingMap: Observable<NSError> {
+    var didFailLoadingMap: RxObservable<NSError> {
         return delegate
                 .methodInvoked(#selector(MKMapViewDelegate.mapViewDidFailLoadingMap(_:withError:)))
                 .map { a in
@@ -110,7 +110,7 @@ public extension Reactive where Base: MKMapView {
         return ControlEvent(events: source)
     }
 
-    var didFailToLocateUserWithError: Observable<NSError> {
+    var didFailToLocateUserWithError: RxObservable<NSError> {
         return delegate
                 .methodInvoked(#selector(MKMapViewDelegate.mapView(_:didFailToLocateUserWithError:)))
                 .map { a in

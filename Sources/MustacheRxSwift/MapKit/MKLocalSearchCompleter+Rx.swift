@@ -21,7 +21,7 @@ public extension Reactive where Base: MKLocalSearchCompleter {
         }
     }
 
-    var didUpdateResults: Observable<[MKLocalSearchCompletion]> {
+    var didUpdateResults: RxObservable<[MKLocalSearchCompletion]> {
         return delegate.methodInvoked(#selector(MKLocalSearchCompleterDelegate.completerDidUpdateResults(_:)))
                 .map { a in
                     let completer = a[0] as? MKLocalSearchCompleter
@@ -30,7 +30,7 @@ public extension Reactive where Base: MKLocalSearchCompleter {
                 }
     }
 
-    var didFailWithError: Observable<[MKLocalSearchCompletion]> {
+    var didFailWithError: RxObservable<[MKLocalSearchCompletion]> {
         return delegate.methodInvoked(#selector(MKLocalSearchCompleterDelegate.completer(_:didFailWithError:)))
                 .map { a in
                     let completer = a[0] as? MKLocalSearchCompleter

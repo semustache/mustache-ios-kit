@@ -10,15 +10,15 @@ public extension CLLocation {
 
 public extension Reactive where Base: CLGeocoder {
 
-    func reverseGeocodeLocation(location: CLLocation) -> Observable<[CLPlacemark]> {
-        return Observable<[CLPlacemark]>.create { observer in
+    func reverseGeocodeLocation(location: CLLocation) -> RxObservable<[CLPlacemark]> {
+        return RxObservable<[CLPlacemark]>.create { observer in
             geocodeHandler(observer: observer, geocode: curry2(self.base.reverseGeocodeLocation, location))
             return Disposables.create { self.base.cancelGeocode() }
         }
     }
 
-    func reverseGeocodeLocation(coordinate: CLLocationCoordinate2D) -> Observable<[CLPlacemark]> {
-        return Observable<[CLPlacemark]>.create { observer in
+    func reverseGeocodeLocation(coordinate: CLLocationCoordinate2D) -> RxObservable<[CLPlacemark]> {
+        return RxObservable<[CLPlacemark]>.create { observer in
             let location = CLLocation(coordinate: coordinate)
             geocodeHandler(observer: observer, geocode: curry2(self.base.reverseGeocodeLocation, location))
             return Disposables.create { self.base.cancelGeocode() }
@@ -26,22 +26,22 @@ public extension Reactive where Base: CLGeocoder {
     }
 
     @available(iOS 11.0, *)
-    func geocodePostalAddress(_ postalAddress: CNPostalAddress) -> Observable<[CLPlacemark]> {
-        return Observable<[CLPlacemark]>.create { observer in
+    func geocodePostalAddress(_ postalAddress: CNPostalAddress) -> RxObservable<[CLPlacemark]> {
+        return RxObservable<[CLPlacemark]>.create { observer in
             geocodeHandler(observer: observer, geocode: curry2(self.base.geocodePostalAddress, postalAddress))
             return Disposables.create { self.base.cancelGeocode() }
         }
     }
 
-    func geocodeAddressString(addressString: String) -> Observable<[CLPlacemark]> {
-        return Observable<[CLPlacemark]>.create { observer in
+    func geocodeAddressString(addressString: String) -> RxObservable<[CLPlacemark]> {
+        return RxObservable<[CLPlacemark]>.create { observer in
             geocodeHandler(observer: observer, geocode: curry2(self.base.geocodeAddressString, addressString))
             return Disposables.create { self.base.cancelGeocode() }
         }
     }
 
-    func geocodeAddressString(addressString: String, inRegion region: CLRegion?) -> Observable<[CLPlacemark]> {
-        return Observable<[CLPlacemark]>.create { observer in
+    func geocodeAddressString(addressString: String, inRegion region: CLRegion?) -> RxObservable<[CLPlacemark]> {
+        return RxObservable<[CLPlacemark]>.create { observer in
             geocodeHandler(observer: observer, geocode: curry3(self.base.geocodeAddressString, addressString, region))
             return Disposables.create { self.base.cancelGeocode() }
         }

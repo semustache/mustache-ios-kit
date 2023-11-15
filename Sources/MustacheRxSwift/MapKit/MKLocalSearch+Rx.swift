@@ -3,8 +3,8 @@ import RxSwift
 
 public extension MKLocalSearch {
 
-    func mapItems() -> Observable<[MKMapItem]> {
-        return Observable.create { observer in
+    func mapItems() -> RxObservable<[MKMapItem]> {
+        return RxObservable.create { observer in
             self.start(completionHandler: { (response, error) in
                 if let error = error {
                     observer.onError(error)

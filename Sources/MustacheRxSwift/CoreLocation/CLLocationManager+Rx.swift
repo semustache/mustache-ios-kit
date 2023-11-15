@@ -20,7 +20,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `proxyDelegate` message.
     */
-    var didUpdateLocations: Observable<[CLLocation]> {
+    var didUpdateLocations: RxObservable<[CLLocation]> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManager(_:didUpdateLocations:)))
                 .map { a in
@@ -31,7 +31,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
-    var didFailWithError: Observable<NSError> {
+    var didFailWithError: RxObservable<NSError> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate.locationManager(_:didFailWithError:)))
                 .map { a in
                     return try castOrThrow(NSError.self, a[1])
@@ -41,7 +41,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
-    var didFinishDeferredUpdatesWithError: Observable<NSError?> {
+    var didFinishDeferredUpdatesWithError: RxObservable<NSError?> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManager(_:didFinishDeferredUpdatesWithError:)))
                 .map { a in
@@ -54,7 +54,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
-    var didPauseLocationUpdates: Observable<Void> {
+    var didPauseLocationUpdates: RxObservable<Void> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManagerDidPauseLocationUpdates(_:)))
                 .map { _ in
@@ -65,7 +65,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
-    var didResumeLocationUpdates: Observable<Void> {
+    var didResumeLocationUpdates: RxObservable<Void> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManagerDidResumeLocationUpdates(_:)))
                 .map { _ in
@@ -78,7 +78,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
-    var didUpdateHeading: Observable<CLHeading> {
+    var didUpdateHeading: RxObservable<CLHeading> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate.locationManager(_:didUpdateHeading:)))
                 .map { a in
                     return try castOrThrow(CLHeading.self, a[1])
@@ -90,7 +90,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
-    var didEnterRegion: Observable<CLRegion> {
+    var didEnterRegion: RxObservable<CLRegion> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate.locationManager(_:didEnterRegion:)))
                 .map { a in
                     return try castOrThrow(CLRegion.self, a[1])
@@ -100,7 +100,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
-    var didExitRegion: Observable<CLRegion> {
+    var didExitRegion: RxObservable<CLRegion> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate.locationManager(_:didExitRegion:)))
                 .map { a in
                     return try castOrThrow(CLRegion.self, a[1])
@@ -111,7 +111,7 @@ public extension Reactive where Base: CLLocationManager {
     Reactive wrapper for `delegate` message.
     */
     @available(OSX 10.10, *)
-    var didDetermineStateForRegion: Observable<(state: CLRegionState, region: CLRegion)> {
+    var didDetermineStateForRegion: RxObservable<(state: CLRegionState, region: CLRegion)> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManager(_:didDetermineState:for:)))
                 .map { a in
@@ -125,7 +125,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
-    var monitoringDidFailForRegionWithError: Observable<(region: CLRegion?, error: NSError)> {
+    var monitoringDidFailForRegionWithError: RxObservable<(region: CLRegion?, error: NSError)> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManager(_:monitoringDidFailFor:withError:)))
                 .map { a in
@@ -138,7 +138,7 @@ public extension Reactive where Base: CLLocationManager {
     /**
     Reactive wrapper for `delegate` message.
     */
-    var didStartMonitoringForRegion: Observable<CLRegion> {
+    var didStartMonitoringForRegion: RxObservable<CLRegion> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManager(_:didStartMonitoringFor:)))
                 .map { a in
@@ -152,7 +152,7 @@ public extension Reactive where Base: CLLocationManager {
     Reactive wrapper for `delegate` message.
     */
     @available(iOS 13.0, *)
-    var didRangeBeaconsInRegion: Observable<(beacons: [CLBeacon], region: CLBeaconRegion)> {
+    var didRangeBeaconsInRegion: RxObservable<(beacons: [CLBeacon], region: CLBeaconRegion)> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManager(_:didRange:satisfying:)))
                 .map { a in
@@ -166,7 +166,7 @@ public extension Reactive where Base: CLLocationManager {
     Reactive wrapper for `delegate` message.
     */
     @available(iOS 13.0, *)
-    var rangingBeaconsDidFailForRegionWithError: Observable<(region: CLBeaconRegion, error: NSError)> {
+    var rangingBeaconsDidFailForRegionWithError: RxObservable<(region: CLBeaconRegion, error: NSError)> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                         .locationManager(_:didFailRangingFor:error:)))
                 .map { a in
@@ -182,7 +182,7 @@ public extension Reactive where Base: CLLocationManager {
     Reactive wrapper for `delegate` message.
     */
     @available(iOS 8.0, *)
-    var didVisit: Observable<CLVisit> {
+    var didVisit: RxObservable<CLVisit> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate.locationManager(_:didVisit:)))
                 .map { a in
                     return try castOrThrow(CLVisit.self, a[1])
@@ -195,7 +195,7 @@ public extension Reactive where Base: CLLocationManager {
     Reactive wrapper for `delegate` message.
     */
     @available(iOS 14.0, *)
-    var didChangeAuthorizationStatus: Observable<CLAuthorizationStatus> {
+    var didChangeAuthorizationStatus: RxObservable<CLAuthorizationStatus> {
         return delegate.methodInvoked(#selector(CLLocationManagerDelegate
                 .locationManagerDidChangeAuthorization(_:)))
                 .map { a in

@@ -6,15 +6,15 @@ import Resolver
 
 public protocol RenewTokenServiceType {
 
-    var token: Observable<Void> { get }
+    var token: RxObservable<Void> { get }
 
-    func trackErrors<O: ObservableConvertibleType>(for source: O) -> Observable<Void> where O.Element == Error
+    func trackErrors<O: ObservableConvertibleType>(for source: O) -> RxObservable<Void> where O.Element == Error
 
 }
 
 public class RenewTokenService: RenewTokenServiceType {
 
-    public lazy var token: Observable<Void> = {
+    public lazy var token: RxObservable<Void> = {
         return self.relay
                 .flatMapFirst { _ in self.tokenService.updateToken() }
                 .startWith(Void())
@@ -35,7 +35,7 @@ public class RenewTokenService: RenewTokenServiceType {
      - parameter source: An `Observable` (or like type) that emits errors.
      - returns: A trigger that will emit when it's safe to retry the request.
      */
-    public func trackErrors<O: ObservableConvertibleType>(for source: O) -> Observable<Void> where O.Element == Error {
+    public func trackErrors<O: ObservableConvertibleType>(for source: O) -> RxObservable<Void> where O.Element == Error {
         let lock = self.lock
         let relay = self.relay
         let error = source
@@ -63,7 +63,7 @@ public class RenewTokenService: RenewTokenServiceType {
 
 public extension ObservableConvertibleType where Element == Error {
 
-    func renewToken(with service: RenewTokenServiceType) -> Observable<Void> {
+    func renewToken(with service: RenewTokenServiceType) -> RxObservable<Void> {
         return service.trackErrors(for: self)
     }
 }

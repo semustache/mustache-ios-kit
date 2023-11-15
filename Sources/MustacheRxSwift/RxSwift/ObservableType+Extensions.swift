@@ -3,6 +3,7 @@ import Foundation
 import RxSwift
 
 let 🤷: Void = Void()
+
 public typealias RxObservable = RxSwift.Observable
 
 public extension ObservableType {
@@ -11,7 +12,7 @@ public extension ObservableType {
         return map { try $0.filter(isIncluded) }
     }
 
-    func mapVoid() -> RxSwift.Observable<Void> {
+    func mapVoid() -> RxObservable<Void> {
         return self.map { _ in return 🤷 }
     }
 

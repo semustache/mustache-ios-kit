@@ -5,11 +5,11 @@ import UIKit
 
 public extension Reactive where Base: UNUserNotificationCenter {
 
-    var isAuthorized: Observable<Bool> {
+    var isAuthorized: RxObservable<Bool> {
         return UIApplication.shared.rx.applicationDidBecomeActive
                 .startWith(())
-                .flatMap { [base = self.base] _ -> Observable<Bool> in
-                    return Observable<Bool>.create { observer in
+                .flatMap { [base = self.base] _ -> RxObservable<Bool> in
+                    return RxObservable<Bool>.create { observer in
                         base.getNotificationSettings(completionHandler: { (settings: UNNotificationSettings) in
                             guard settings.authorizationStatus == .authorized else { observer.onNext(false); return; }
                             observer.onNext(true)
@@ -19,8 +19,8 @@ public extension Reactive where Base: UNUserNotificationCenter {
         }
     }
 
-    func requestAuthorization(options: UNAuthorizationOptions = []) -> Observable<Bool> {
-        return Observable.create { (observer: AnyObserver<Bool>) in
+    func requestAuthorization(options: UNAuthorizationOptions = []) -> RxObservable<Bool> {
+        return RxObservable.create { (observer: AnyObserver<Bool>) in
             DispatchQueue.main.async {
                 self.base.requestAuthorization(options: options, completionHandler: { (_ granted: Bool, _ error: Error?) -> Void in
                     if let error = error {
@@ -37,8 +37,8 @@ public extension Reactive where Base: UNUserNotificationCenter {
         }
     }
 
-    func getNotificationSettings() -> Observable<UNNotificationSettings> {
-        return Observable.create { (observer: AnyObserver<UNNotificationSettings>) in
+    func getNotificationSettings() -> RxObservable<UNNotificationSettings> {
+        return RxObservable.create { (observer: AnyObserver<UNNotificationSettings>) in
             DispatchQueue.main.async {
                 self.base.getNotificationSettings(completionHandler: { (settings: UNNotificationSettings) -> Void in
                     observer.onNext(settings)

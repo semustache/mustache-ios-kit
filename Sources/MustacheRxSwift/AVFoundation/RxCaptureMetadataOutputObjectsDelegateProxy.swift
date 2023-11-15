@@ -154,7 +154,7 @@ public extension Reactive where Base: AVCaptureMetadataOutput {
         return RxCaptureMetadataOutputObjectsDelegateProxy.proxy(for: base)
     }
 
-    var didOutput: Observable<[AVMetadataObject]> {
+    var didOutput: RxObservable<[AVMetadataObject]> {
         return delegate.methodInvoked(#selector(AVCaptureMetadataOutputObjectsDelegate.metadataOutput(_:didOutput:from:)))
                 .map { a in
                     let metadataObjects = a[1] as? [AVMetadataObject]
