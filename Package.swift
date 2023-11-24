@@ -46,6 +46,6 @@ let package = Package(
             dependencies: ["RxSwift", "RxSwiftExt", "RxViewController", "MustacheServices", "MustacheUIKit"]),
         .target(
             name: "MustacheCombine",
-            dependencies: []),
+            dependencies: ["MustacheFoundation", "Resolver"]),
     ]
 )
