@@ -53,7 +53,7 @@ public class StorageCombine<T: Codable>: NSObject {
     
     // MARK: propertyWrapper variables
     
-    public var projectedValue: AnyPublisher<T?, Never>? {
+    public var projectedValue: AnyPublisher<T?, Never> {
         return subject.eraseToAnyPublisher()
     }
     
