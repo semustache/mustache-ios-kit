@@ -47,5 +47,8 @@ let package = Package(
         .target(
             name: "MustacheCombine",
             dependencies: ["MustacheFoundation", "Resolver"]),
+        .testTarget(
+            name: "MustacheCombineTest",
+            dependencies: ["MustacheCombine"]),
     ]
 )

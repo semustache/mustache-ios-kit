@@ -40,7 +40,7 @@ public class StorageCombine<T: Codable>: NSObject {
     
     private let key: String
     private let mode: StorageMode
-    private let cacheExpiration: Double?
+    private let expiration: ExpirationType?
     
     // MARK: Combine
     
@@ -57,17 +57,22 @@ public class StorageCombine<T: Codable>: NSObject {
         return subject.eraseToAnyPublisher()
     }
     
-    public init(_ key: String, mode: StorageMode, defaultValue: T? = nil, cacheExpiration: Double? = nil) {
+    public init(_ key: String, mode: StorageMode, defaultValue: T? = nil, expiration: ExpirationType? = nil) {
         self.key = key
         self.mode = mode
-        self.cacheExpiration = cacheExpiration
+        self.expiration = expiration
         self.subject = CurrentValueSubject(defaultValue)
-
+        
         super.init()
         
         self.configurePublisher()
         self.configureInitialValue(defaultValue: defaultValue)
         self.configureInMemory()
+    }
+    
+    convenience init(_ key: String, mode: StorageMode, defaultValue: T? = nil, cacheExpiration: Double? = nil) {
+        let expiration = cacheExpiration.exists ? ExpirationType.seconds(cacheExpiration!) : nil
+        self.init(key, mode: mode, defaultValue: defaultValue, expiration: expiration)
     }
     
     func configurePublisher() {
@@ -116,6 +121,68 @@ public class StorageCombine<T: Codable>: NSObject {
         }
     }
     
+    private func isStillValid(cachedAt: Date) -> Bool {
+        
+        guard let expiration = self.expiration else { return true }
+        
+        switch expiration {
+            case .seconds(let seconds):
+                let expirationTime = cachedAt.addingTimeInterval(seconds)
+                if expirationTime > .nowSafe {
+                    return false
+                }
+            case .dayOfWeek(let dayOfWeek):
+                
+                let components = DateComponents(calendar: Calendar.daDK, hour: 23, minute: 59, second: 59, weekday: dayOfWeek)
+                let expirationTime = Calendar.daDK.nextDate(after: cachedAt,
+                                                            matching: components,
+                                                            matchingPolicy: .nextTime)
+                
+                if let expirationTime, expirationTime > .nowSafe {
+                    return false
+                }
+                
+            case .hourOfDay(let hourOfDay):
+                
+                let components = DateComponents(calendar: Calendar.daDK, hour: hourOfDay, minute: 0, second: 0)
+                let expirationTime = Calendar.daDK.nextDate(after: cachedAt,
+                                                            matching: components,
+                                                            matchingPolicy: .nextTime)
+                
+                if let expirationTime, expirationTime > .nowSafe {
+                    return false
+                }
+                
+            case .timestamp(let timestamp):
+                
+                if timestamp > .nowSafe {
+                    return false
+                }
+        }
+        return true
+    }
+    
+    private func clear() {
+        
+        switch self.mode {
+            case .userDefaults(let defaults):
+                defaults.removeObject(forKey: self.key)
+            case .keychain(let accessibility):
+                KeychainWrapper.standard.removeObject(forKey: self.key, withAccessibility: accessibility)
+            case .memory(let scope):
+                switch scope {
+                    case .singleton:
+                        let key = String(describing: T.self)
+                        singletonMemoryContainer[key] = nil
+                    case .unique:
+                        self.uniqueMemoryStorage = nil
+                    case .shared:
+                        sharedMemoryValueContainer.removeObject(forKey: self.sharedMemoryKey)
+                }
+        }
+        NotificationCenter.default.post(name: notificationName(key: self.key), object: nil)
+    }
+    
     // MARK: StorageMode.userDefaults
     
     // MARK: StorageMode.keychain
@@ -133,6 +200,8 @@ public class StorageCombine<T: Codable>: NSObject {
     
 }
 
+
+
 // MARK: StorageMode.userDefaults
 @available(iOS 13.0, *)
 extension StorageCombine {
@@ -140,20 +209,15 @@ extension StorageCombine {
     func getUserDefaults(defaults: UserDefaults) -> T? {
         
         guard let data = defaults.data(forKey: self.key) else { return nil }
+        
         guard let cache = try? JSONDecoder().decode(CacheContainer<T>.self, from: data) else { return nil }
         
-        /// Object has expired, so we remove it from the cache
-        if let expiration = self.cacheExpiration, Date().timeIntervalSince(cache.createdAt) > expiration {
-            
-            defaults.removeObject(forKey: self.key)
-            
-            NotificationCenter.default.post(name: notificationName(key: self.key), object: nil)
-            
+        guard self.isStillValid(cachedAt: cache.createdAt) else {
+            self.clear()
             return nil
-        } else {
-            return cache.value
         }
         
+        return cache.value
     }
     
     func setUserDefaults(defaults: UserDefaults, value: T?) {
@@ -174,7 +238,6 @@ extension StorageCombine {
     }
     
 }
-
 // MARK: StorageMode.keychain
 @available(iOS 13.0, *)
 extension StorageCombine {
@@ -182,19 +245,15 @@ extension StorageCombine {
     func getKeychain(accessibility: KeychainItemAccessibility) -> T? {
         
         guard let data = KeychainWrapper.standard.data(forKey: self.key, withAccessibility: accessibility) else { return nil }
+        
         guard let cache = try? JSONDecoder().decode(CacheContainer<T>.self, from: data) else { return nil }
         
-        /// Object has expired, so we remove it from the cache
-        if let expiration = self.cacheExpiration, Date().timeIntervalSince(cache.createdAt) > expiration {
-            
-            KeychainWrapper.standard.removeObject(forKey: self.key, withAccessibility: accessibility)
-            
-            NotificationCenter.default.post(name: notificationName(key: self.key), object: nil)
-            
+        guard self.isStillValid(cachedAt: cache.createdAt) else {
+            self.clear()
             return nil
-        } else {
-            return cache.value
         }
+        
+        return cache.value
     }
     
     func setKeychain(accessibility: KeychainItemAccessibility, value: T?) {
@@ -231,45 +290,34 @@ extension StorageCombine {
                 guard let cache = singletonMemoryContainer[key] as? CacheContainer<T> else { return nil }
                 
                 /// Object has expired, so we remove it from the cache
-                if let expiration = self.cacheExpiration, Date().timeIntervalSince(cache.createdAt) > expiration {
-                    
-                    NotificationCenter.default.post(name: notificationName(key: self.key), object: nil)
-                    singletonMemoryContainer[key] = nil
-                    
+                guard self.isStillValid(cachedAt: cache.createdAt) else {
+                    self.clear()
                     return nil
-                } else {
-                    return cache.value
                 }
+                
+                return cache.value
                 
             case .unique:
                 
                 guard let cache = self.uniqueMemoryStorage else { return nil }
                 
-                /// Object has expired, so we remove it from the cache
-                if let expiration = self.cacheExpiration, Date().timeIntervalSince(cache.createdAt) > expiration {
-                    
-                    NotificationCenter.default.post(name: notificationName(key: self.key), object: self)
-                    
+                guard self.isStillValid(cachedAt: cache.createdAt) else {
+                    self.clear()
                     return nil
-                    
-                } else {
-                    return cache.value
                 }
+                
+                return cache.value
                 
             case .shared:
 
                 guard let cache = sharedMemoryValueContainer.object(forKey: self.sharedMemoryKey) as? CacheContainer<T> else { return nil }
                 
-                /// Object has expired, so we remove it from the cache
-                if let expiration = self.cacheExpiration, Date().timeIntervalSince(cache.createdAt) > expiration {
-                    
-                    NotificationCenter.default.post(name: notificationName(key: self.key), object: nil)
-                    sharedMemoryValueContainer.removeObject(forKey: self.sharedMemoryKey)
-                    
+                guard self.isStillValid(cachedAt: cache.createdAt) else {
+                    self.clear()
                     return nil
-                } else {
-                    return cache.value
                 }
+                
+                return cache.value
         }
     }
     
@@ -344,6 +392,23 @@ public enum MemoryScope {
     
     /// Shared acros the app, dealocated when no longer used.
     case shared
+}
+
+/// Defines the type of expiration used for the storage.
+public enum ExpirationType {
+    
+    /// Seconds after setting the value
+    case seconds(TimeInterval)
+    
+    /// After a day of the week has passed, e.g. 2 equals every monday, 1 equals sunday, based on Calendar Weekday
+    case dayOfWeek(Int)
+    
+    /// After an hour of the day has passed, e.g. every day at 00:00, zero index based which means 0 is 00:00, 1 is 01:00 etc.
+    case hourOfDay(Int)
+    
+    /// At a specific timestamp
+    case timestamp(Date)
+    
 }
 
 /// Container used to handle expiration of cached objects
