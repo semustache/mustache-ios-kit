@@ -128,7 +128,7 @@ public class StorageCombine<T: Codable>: NSObject {
         switch expiration {
             case .seconds(let seconds):
                 let expirationTime = cachedAt.addingTimeInterval(seconds)
-                if expirationTime > .nowSafe {
+                if expirationTime < .nowSafe {
                     return false
                 }
             case .dayOfWeek(let dayOfWeek):
@@ -138,7 +138,7 @@ public class StorageCombine<T: Codable>: NSObject {
                                                             matching: components,
                                                             matchingPolicy: .nextTime)
                 
-                if let expirationTime, expirationTime > .nowSafe {
+                if let expirationTime, expirationTime < .nowSafe {
                     return false
                 }
                 
@@ -149,13 +149,13 @@ public class StorageCombine<T: Codable>: NSObject {
                                                             matching: components,
                                                             matchingPolicy: .nextTime)
                 
-                if let expirationTime, expirationTime > .nowSafe {
+                if let expirationTime, expirationTime < .nowSafe {
                     return false
                 }
                 
-            case .timestamp(let timestamp):
+            case .timestamp(let expirationTime):
                 
-                if timestamp > .nowSafe {
+                if expirationTime < .nowSafe {
                     return false
                 }
         }
@@ -326,7 +326,8 @@ extension StorageCombine {
             case .singleton:
                 
                 let key = String(describing: T.self)
-                singletonMemoryContainer[key] = value
+                let cache = CacheContainer(value: value, createdAt: Date())
+                singletonMemoryContainer[key] = cache
                 
                 // Sends notification so that subscribers of CurrentValueSubject gets the newest object
                 NotificationCenter.default.post(name: notificationName(key: self.key),
