@@ -5,8 +5,8 @@ import Combine
 import Resolver
 
 private var singletonMemoryContainer: [String: Any] = [:]
-private var sharedMemoryKeyContainer = NSHashTable<AnyObject>.weakObjects()
-private var sharedMemoryValueContainer = NSMapTable<NSString, AnyObject>.weakToWeakObjects()
+private var sharedMemoryKeyContainer = NSHashTable<NSString>.weakObjects()
+private var sharedMemoryValueContainer = NSMapTable<NSString, AnyObject>.weakToStrongObjects()
 
 @available(iOS 13.0, *)
 @propertyWrapper
@@ -40,7 +40,7 @@ public class StorageCombine<T: Codable>: NSObject {
     
     private let key: String
     private let mode: StorageMode
-    private let expiration: ExpirationType?
+    private let expiration: ExpirationType
     
     // MARK: Combine
     
@@ -49,7 +49,7 @@ public class StorageCombine<T: Codable>: NSObject {
     
     // MARK: Helpers
     
-    private let valueUserInfoKey: String = "\(#file)-\(#function)"
+    private let valueUserInfoKey: String = "StorageCombine-valueUserInfoKey"
     
     // MARK: propertyWrapper variables
     
@@ -57,7 +57,7 @@ public class StorageCombine<T: Codable>: NSObject {
         return subject.eraseToAnyPublisher()
     }
     
-    public init(_ key: String, mode: StorageMode, defaultValue: T? = nil, expiration: ExpirationType? = nil) {
+    public init(_ key: String, mode: StorageMode, defaultValue: T? = nil, expiration: ExpirationType = .none) {
         self.key = key
         self.mode = mode
         self.expiration = expiration
@@ -71,7 +71,7 @@ public class StorageCombine<T: Codable>: NSObject {
     }
     
     convenience init(_ key: String, mode: StorageMode, defaultValue: T? = nil, cacheExpiration: Double? = nil) {
-        let expiration = cacheExpiration.exists ? ExpirationType.seconds(cacheExpiration!) : nil
+        let expiration = cacheExpiration.exists ? ExpirationType.seconds(cacheExpiration!) : .none
         self.init(key, mode: mode, defaultValue: defaultValue, expiration: expiration)
     }
     
@@ -84,7 +84,7 @@ public class StorageCombine<T: Codable>: NSObject {
                 nil
         }
         
-        self.localeChangeObserver = NotificationCenter.default.addObserver(forName: notificationName(key: key),
+        self.localeChangeObserver = NotificationCenter.default.addObserver(forName: notificationName(key: self.key),
                                                                            object: object,
                                                                            queue: .main) { [unowned self] notification in
             
@@ -109,23 +109,26 @@ public class StorageCombine<T: Codable>: NSObject {
     }
     
     func configureInMemory() {
+        
         guard case .memory(let scope) = self.mode, scope == .shared else { return }
         
         if let sharedKey = sharedMemoryKeyContainer.allObjects
-            .compactMap({ $0 as? NSString })
+            .compactMap({ $0 })
             .first(where: { $0.isEqual(to: self.key) }){
             self.sharedMemoryKey = sharedKey
         } else {
-            self.sharedMemoryKey = NSString(string: self.key)
-            sharedMemoryKeyContainer.add(self.sharedMemoryKey)
+            let sharedMemoryKey = NSString(string: self.key)
+            sharedMemoryKeyContainer.add(sharedMemoryKey)
+            self.sharedMemoryKey = sharedMemoryKey
         }
     }
     
     private func isStillValid(cachedAt: Date) -> Bool {
         
-        guard let expiration = self.expiration else { return true }
-        
-        switch expiration {
+        switch self.expiration {
+            case .none:
+                return true
+                
             case .seconds(let seconds):
                 let expirationTime = cachedAt.addingTimeInterval(seconds)
                 if expirationTime < .nowSafe {
@@ -409,6 +412,8 @@ public enum ExpirationType {
     
     /// At a specific timestamp
     case timestamp(Date)
+    
+    case none
     
 }
 

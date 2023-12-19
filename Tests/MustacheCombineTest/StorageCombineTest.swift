@@ -5,7 +5,7 @@ import MustacheCombine
 @available(iOS 13.0, *)
 final class StorageCombineTest: XCTestCase {
 
-    @StorageCombine("\(#file)-\(#function)", mode: .userDefaults())
+    @StorageCombine("\(#file)-\(#function)", mode: .memory(scope: .shared), expiration: .none)
     var storedObject: StoredObject?
     
     override func setUpWithError() throws {
