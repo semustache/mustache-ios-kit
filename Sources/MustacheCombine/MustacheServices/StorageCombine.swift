@@ -289,8 +289,7 @@ extension StorageCombine {
         switch scope {
             case .singleton:
             
-                let key = String(describing: T.self)
-                guard let cache = singletonMemoryContainer[key] as? CacheContainer<T> else { return nil }
+                guard let cache = singletonMemoryContainer[self.key] as? CacheContainer<T?>, let value = cache.value else { return nil }
                 
                 /// Object has expired, so we remove it from the cache
                 guard self.isStillValid(cachedAt: cache.createdAt) else {
@@ -328,9 +327,8 @@ extension StorageCombine {
         switch scope {
             case .singleton:
                 
-                let key = String(describing: T.self)
                 let cache = CacheContainer(value: value, createdAt: Date())
-                singletonMemoryContainer[key] = cache
+                singletonMemoryContainer[self.key] = cache
                 
                 // Sends notification so that subscribers of CurrentValueSubject gets the newest object
                 NotificationCenter.default.post(name: notificationName(key: self.key),

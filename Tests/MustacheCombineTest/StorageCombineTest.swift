@@ -4,9 +4,18 @@ import MustacheCombine
 
 @available(iOS 13.0, *)
 final class StorageCombineTest: XCTestCase {
+    
+    @StorageCombine("memorySingletonNone", mode: .memory(scope: .singleton), expiration: .none)
+    var memorySingletonNone: StoredObject?
 
-    @StorageCombine("\(#file)-\(#function)", mode: .memory(scope: .shared), expiration: .none)
-    var storedObject: StoredObject?
+    @StorageCombine("memorySharedNone", mode: .memory(scope: .shared), expiration: .none)
+    var memorySharedNone: StoredObject?
+    
+    @StorageCombine("memorySharedNone", mode: .memory(scope: .shared), expiration: .none)
+    var memorySharedNone2: StoredObject?
+    
+    @StorageCombine("memorySharedNone", mode: .memory(scope: .unique), expiration: .none)
+    var memoryUniqueNone: StoredObject?
     
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -14,27 +23,48 @@ final class StorageCombineTest: XCTestCase {
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
-        self.storedObject = nil
-        XCTAssertNil(self.storedObject)
+        self.memorySharedNone = nil
+        XCTAssertNil(self.memorySharedNone)
     }
-
-    func testSimpleUserDefaults() throws {
+    
+    func testMemorySingletonNone1() throws {
         
         let stored = StoredObject()
         
-        XCTAssertNil(self.storedObject)
-        self.storedObject = stored
+        XCTAssertNil(self.memorySingletonNone)
+        self.memorySingletonNone = stored
+        XCTAssertEqual(self.memorySingletonNone, stored)
+                
+    }
+
+    func testMemorySingletonNone2() throws {
         
-        XCTAssertEqual(self.storedObject, stored)
+        XCTAssertNotNil(self.memorySingletonNone)
         
     }
 
-//    func testPerformanceExample() throws {
-//        // This is an example of a performance test case.
-//        self.measure {
-//            // Put the code you want to measure the time of here.
-//        }
-//    }
+    func testMemorySharedNone() throws {
+        
+        let stored = StoredObject()
+        
+        XCTAssertNil(self.memorySharedNone)
+        self.memorySharedNone = stored
+        
+        XCTAssertEqual(self.memorySharedNone, stored)
+        XCTAssertEqual(self.memorySharedNone2, stored)
+        
+    }
+    
+    func testMemoryUniqueNone() throws {
+        
+        let stored = StoredObject()
+        
+        XCTAssertNil(self.memoryUniqueNone)
+        self.memoryUniqueNone = stored
+        
+        XCTAssertEqual(self.memoryUniqueNone, stored)        
+        
+    }
 
 }
 
