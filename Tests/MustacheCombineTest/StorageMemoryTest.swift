@@ -3,7 +3,7 @@ import XCTest
 import MustacheCombine
 
 @available(iOS 13.0, *)
-final class StorageCombineTest: XCTestCase {
+final class StorageMemoryTest: XCTestCase {
     
     @StorageCombine("memorySingletonNone", mode: .memory(scope: .singleton), expiration: .none)
     var memorySingletonNone: StoredObject?
@@ -62,18 +62,9 @@ final class StorageCombineTest: XCTestCase {
         XCTAssertNil(self.memoryUniqueNone)
         self.memoryUniqueNone = stored
         
-        XCTAssertEqual(self.memoryUniqueNone, stored)        
+        XCTAssertEqual(self.memoryUniqueNone, stored)
         
     }
 
 }
 
-class StoredObject: Codable, Equatable {
-    
-    var id: UUID = UUID()
-
-    static func == (lhs: StoredObject, rhs: StoredObject) -> Bool {
-        return lhs.id == rhs.id
-    }
-    
-}

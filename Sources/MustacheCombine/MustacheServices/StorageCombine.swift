@@ -223,7 +223,7 @@ extension StorageCombine {
         return cache.value
     }
     
-    func setUserDefaults(defaults: UserDefaults, value: T?) {
+    func setUserDefaults(defaults: UserDefaults, value: T?, createdAt: Date = .nowSafe) {
         if let value = value {
             let cache = CacheContainer(value: value, createdAt: Date())
             if let encoded: Data = try? JSONEncoder().encode(cache) {
