@@ -28,6 +28,11 @@ final class StorageDefaultsTest: XCTestCase {
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
+        self.defaultsSeconds = nil
+        self.defaultsDate = nil
+        self.defaultsHour = nil
+        self.defaultsDay = nil
+        self.defaultsNone = nil        
     }
     
     func testDefaultsSeconds() throws {
