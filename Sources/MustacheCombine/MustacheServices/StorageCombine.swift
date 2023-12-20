@@ -372,28 +372,29 @@ extension StorageCombine {
 /// Defines the storage mode to be used
 public enum StorageMode {
     
-    /// Uses UserDefaults, default if not specified.
+    /// Uses UserDefaults, uses standard if not specified.
     case userDefaults(defaults: UserDefaults = .standard)
     
     /// Uses Keychain.
     case keychain(accessibility: KeychainItemAccessibility = .afterFirstUnlock)
     
     /// Uses Memory.
-    case memory(scope: MemoryScope = .unique)
+    case memory(scope: MemoryScope = .shared)
         
 }
 
 /// Defines the life cycle of the memory storage.
 public enum MemoryScope {
     
-    /// Shared acros the apps lifetime, never deallocated unless app is killed.
+    /// Shared acros the app, dealocated when no longer used, default if not specified.
+    case shared
+    
+    /// Shared acros the apps lifetime, never deallocated unless app is killed
     case singleton
     
-    /// Each instance is unique, default if not specified.
+    /// Each instance is unique, same keys does not overwrite, not commenly used
     case unique
-    
-    /// Shared acros the app, dealocated when no longer used.
-    case shared
+        
 }
 
 /// Defines the type of expiration used for the storage.

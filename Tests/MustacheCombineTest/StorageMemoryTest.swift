@@ -17,7 +17,7 @@ final class StorageMemoryTest: XCTestCase {
     @StorageCombine("memorySharedNone", mode: .memory(scope: .shared), expiration: .none)
     var memorySharedNone2: StoredObject?
     
-    @StorageCombine("memorySharedNone", mode: .memory(scope: .unique), expiration: .none)
+    @StorageCombine("memoryUniqueNone", mode: .memory(scope: .unique), expiration: .none)
     var memoryUniqueNone: StoredObject?
     
     override func setUpWithError() throws {
