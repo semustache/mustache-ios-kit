@@ -5,22 +5,23 @@ import MustacheCombine
 @available(iOS 13.0, *)
 final class StorageDefaultsTest: XCTestCase {
     
-    @StorageCombine("memorySingletonNone", mode: .userDefaults(), expiration: .seconds(2))
+    @StorageCombine("defaultsSeconds", mode: .userDefaults(), expiration: .seconds(2))
     var defaultsSeconds: StoredObject?
 
-    @StorageCombine("memorySharedNone", mode: .userDefaults(), expiration: .timestamp(.nowSafe))
-    var defaultsDate: StoredObject?
+    @StorageCombine("defaultsTimeStampNow", mode: .userDefaults(), expiration: .timestamp(Date.nowSafe))
+    var defaultsTimeStampNow: StoredObject?
     
-    @StorageCombine("memorySharedNone", mode: .userDefaults(), expiration: .hourOfDay(2))
+    @StorageCombine("defaultsTimeStampFuture", mode: .userDefaults(), expiration: .timestamp(Date.distantFuture))
+    var defaultsTimeStampFuture: StoredObject?
+    
+    @StorageCombine("defaultsHour", mode: .userDefaults(), expiration: .hourOfDay(2))
     var defaultsHour: StoredObject?
     
-    @StorageCombine("memorySharedNone", mode: .userDefaults(), expiration: .dayOfWeek(2))
+    @StorageCombine("defaultsDay", mode: .userDefaults(), expiration: .dayOfWeek(2))
     var defaultsDay: StoredObject?
     
-    @StorageCombine("memorySharedNone", mode: .userDefaults(), expiration: .none)
+    @StorageCombine("defaultsNone", mode: .userDefaults(), expiration: .none)
     var defaultsNone: StoredObject?
-    
-    
     
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -29,10 +30,12 @@ final class StorageDefaultsTest: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         self.defaultsSeconds = nil
-        self.defaultsDate = nil
+        self.defaultsTimeStampNow = nil
+        self.defaultsTimeStampFuture = nil
         self.defaultsHour = nil
         self.defaultsDay = nil
-        self.defaultsNone = nil        
+        self.defaultsNone = nil
+        
     }
     
     func testDefaultsSeconds() throws {
@@ -47,6 +50,26 @@ final class StorageDefaultsTest: XCTestCase {
         
         XCTAssertNil(self.defaultsSeconds)
                 
+    }
+    
+    func testDefaultsTimeStampNow() throws {
+        
+        let stored = StoredObject()
+        
+        XCTAssertNil(self.defaultsTimeStampNow)
+        self.defaultsTimeStampNow = stored
+        XCTAssertNil(self.defaultsTimeStampNow)
+        
+    }
+    
+    func testDefaultsTimeStampFuture() throws {
+        
+        let stored = StoredObject()
+        
+        XCTAssertNil(self.defaultsTimeStampFuture)
+        self.defaultsTimeStampFuture = stored
+        XCTAssertEqual(self.defaultsTimeStampFuture, stored)
+        
     }
     
     func testDefaultsHour() throws {
@@ -66,16 +89,6 @@ final class StorageDefaultsTest: XCTestCase {
         XCTAssertNil(self.defaultsDay)
         self.defaultsDay = stored
         XCTAssertEqual(self.defaultsDay, stored)
-        
-    }
-    
-    func testDefaultsDate() throws {
-        
-        let stored = StoredObject()
-        
-        XCTAssertNil(self.defaultsDate)
-        self.defaultsDate = stored
-        XCTAssertNil(self.defaultsDate)
         
     }
     

@@ -7,6 +7,9 @@ final class StorageMemoryTest: XCTestCase {
     
     @StorageCombine("memorySingletonNone", mode: .memory(scope: .singleton), expiration: .none)
     var memorySingletonNone: StoredObject?
+    
+    @StorageCombine("memorySingletonNone", mode: .memory(scope: .singleton), expiration: .none)
+    var memorySingletonNone2: StoredObject?
 
     @StorageCombine("memorySharedNone", mode: .memory(scope: .shared), expiration: .none)
     var memorySharedNone: StoredObject?
@@ -23,8 +26,9 @@ final class StorageMemoryTest: XCTestCase {
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
+        self.memorySingletonNone = nil
         self.memorySharedNone = nil
-        XCTAssertNil(self.memorySharedNone)
+        self.memoryUniqueNone = nil
     }
     
     func testMemorySingletonNone1() throws {
@@ -34,13 +38,9 @@ final class StorageMemoryTest: XCTestCase {
         XCTAssertNil(self.memorySingletonNone)
         self.memorySingletonNone = stored
         XCTAssertEqual(self.memorySingletonNone, stored)
-                
-    }
-
-    func testMemorySingletonNone2() throws {
         
-        XCTAssertNotNil(self.memorySingletonNone)
-        
+        XCTAssertNotNil(self.memorySingletonNone2)
+        XCTAssertEqual(self.memorySingletonNone2, stored)
     }
 
     func testMemorySharedNone() throws {

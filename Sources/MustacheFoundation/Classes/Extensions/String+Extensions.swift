@@ -24,8 +24,9 @@ public extension String {
             guard let data = self.data(using: .unicode) else {
                 return nil
             }
+            let options: [NSAttributedString.DocumentReadingOptionKey : Any] = [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue]
             let attributed = try NSAttributedString(data: data,
-                                                    options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], 
+                                                    options: options,
                                                     documentAttributes: nil)
             return attributed.string
         } catch {
