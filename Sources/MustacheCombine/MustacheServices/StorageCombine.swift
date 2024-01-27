@@ -22,7 +22,7 @@ public class StorageCombine<T: Codable>: NSObject {
                 case .memory(let scope):
                     return self.getMemory(scope: scope)
             }
-
+            
         }
         set {
             switch self.mode {
@@ -78,10 +78,10 @@ public class StorageCombine<T: Codable>: NSObject {
     func configurePublisher() {
         
         let object: Any? = switch mode {
-            case .memory(let scope) where scope == .unique:
-                self
-            default:
-                nil
+        case .memory(let scope) where scope == .unique:
+            self
+        default:
+            nil
         }
         
         self.localeChangeObserver = NotificationCenter.default.addObserver(forName: notificationName(key: self.key),
@@ -175,8 +175,7 @@ public class StorageCombine<T: Codable>: NSObject {
             case .memory(let scope):
                 switch scope {
                     case .singleton:
-                        let key = String(describing: T.self)
-                        singletonMemoryContainer[key] = nil
+                        singletonMemoryContainer[self.key] = nil
                     case .unique:
                         self.uniqueMemoryStorage = nil
                     case .shared:
@@ -286,41 +285,27 @@ extension StorageCombine {
 extension StorageCombine {
     
     func getMemory(scope: MemoryScope) -> T? {
+        
+        var cache: CacheContainer<T>? = nil
+        
         switch scope {
             case .singleton:
-            
-                guard let cache = singletonMemoryContainer[self.key] as? CacheContainer<T?>, let value = cache.value else { return nil }
-                
-                /// Object has expired, so we remove it from the cache
-                guard self.isStillValid(cachedAt: cache.createdAt) else {
-                    self.clear()
-                    return nil
-                }
-                
-                return cache.value
-                
+                cache = singletonMemoryContainer[self.key] as? CacheContainer<T?>
             case .unique:
-                
-                guard let cache = self.uniqueMemoryStorage else { return nil }
-                
-                guard self.isStillValid(cachedAt: cache.createdAt) else {
-                    self.clear()
-                    return nil
-                }
-                
-                return cache.value
-                
+                cache = self.uniqueMemoryStorage
             case .shared:
-
-                guard let cache = sharedMemoryValueContainer.object(forKey: self.sharedMemoryKey) as? CacheContainer<T> else { return nil }
-                
-                guard self.isStillValid(cachedAt: cache.createdAt) else {
-                    self.clear()
-                    return nil
-                }
-                
-                return cache.value
+                cache = sharedMemoryValueContainer.object(forKey: self.sharedMemoryKey) as? CacheContainer<T>
         }
+        
+        guard let cache else { return nil }
+        
+        /// Object has expired, so we remove it from the cache
+        guard self.isStillValid(cachedAt: cache.createdAt) else {
+            self.clear()
+            return nil
+        }
+        
+        return cache.value
     }
     
     func setMemory(scope: MemoryScope, value: T?) {
@@ -360,7 +345,7 @@ extension StorageCombine {
                 
                 // Sends notification so that subscribers of CurrentValueSubject gets the newest object
                 NotificationCenter.default.post(name: notificationName(key: self.key),
-                                                object: self,
+                                                object: nil,
                                                 userInfo: [self.valueUserInfoKey: value as Any])
                 
                 
@@ -380,7 +365,7 @@ public enum StorageMode {
     
     /// Uses Memory.
     case memory(scope: MemoryScope = .shared)
-        
+    
 }
 
 /// Defines the life cycle of the memory storage.
@@ -394,7 +379,7 @@ public enum MemoryScope {
     
     /// Each instance is unique, same keys does not overwrite, not commenly used
     case unique
-        
+    
 }
 
 /// Defines the type of expiration used for the storage.
@@ -430,16 +415,4 @@ private class CacheContainer<T: Codable>: Codable {
     static func < (lhs: CacheContainer, rhs: CacheContainer) -> Bool {
         return lhs.createdAt < rhs.createdAt
     }
-}
-
-public extension Double {
-    
-    static var minute: Double { 60 }
-    
-    static var hour: Double { .minute * 60 }
-    
-    static var day: Double { .hour * 24 }
-    
-    static var week: Double { .day * 7 }
-    
 }
