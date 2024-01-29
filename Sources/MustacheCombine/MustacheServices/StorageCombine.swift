@@ -290,7 +290,7 @@ extension StorageCombine {
         
         switch scope {
             case .singleton:
-                cache = singletonMemoryContainer[self.key] as? CacheContainer<T?>
+                cache = singletonMemoryContainer[self.key] as? CacheContainer<T>
             case .unique:
                 cache = self.uniqueMemoryStorage
             case .shared:
